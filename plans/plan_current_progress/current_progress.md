@@ -14,8 +14,14 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
   created; fork decisions recorded in `AGENTS.md` and the ledger; thesis pp. 17-18 and routing PNG re-read,
   discrepancies recorded in the checkpoint. Documentation only; no backend, frontend or test file changed.
 - Verification: `phase_state.py inspect` valid at start; `phase_state.py validate` valid after the documents.
-- Waiting on the owner: PRD approval (gates Task 2 onward). No Supabase change; push only to `origin`.
-- **Next action:** Task 1 read-only feasibility probes; record results in the checkpoint.
+- Task 1 probes done (read-only, anon key, GET only; details in the checkpoint): 560 chunks readable;
+  the existing snapshot loader fails unless `source_spans` (2529 rows) is read in pages, because anon reads
+  return 1000 rows at most; process memory about 186 MB with all 39 curricula; chunk rows give 159 topic
+  groups; `janus-swi` needs SWI-Prolog 9.1.12+ so Debian's apt package (9.0.4) is out; provider base URLs
+  and model ids recorded.
+- Waiting on the owner: PRD approval (gates Task 2 onward) and the topic-directory choice (A recommended).
+  No Supabase change; push only to `origin`.
+- **Next action:** after PRD approval, Task 2 providers and settings, tests first.
 
 ## Delivered repairs
 

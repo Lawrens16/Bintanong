@@ -1,76 +1,126 @@
 ---
 artifact: phase-checkpoint
 phase: 13
-status: in_progress
-sequence: 1
+status: paused
+sequence: 2
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: f1fe3f2b
-working_tree: Task 0 documents staged for the opening commit; head_commit is that commit's parent
-updated_at: 2026-11-15T12:00:00+08:00
+head_commit: 8fa9be52
+working_tree: this checkpoint and current progress staged for the Task 1 commit; head_commit is that commit's parent
+updated_at: 2026-11-15T14:00:00+08:00
 ---
 
 # Phase 13 checkpoint: hosted-LLM agent (fork)
 
 ## Completed Tasks
 
-- Task 0 (records and PRD): branch `feat/hosted-llm-agent` cut from `Lawrens16/dev` at `f1fe3f2b`;
-  [PRD](2026-11-15-hosted-llm-fork-prd.md) drafted with `create-prd`; [plan](phase-13-hosted-llm-agent-plan.md)
-  saved with frontmatter; [hosting research](2026-11-15-phase-13-pre-phase-research.md); fork section added to
-  `AGENTS.md` and the owner-decisions ledger; index and current progress updated.
+- Task 0 (records and PRD), commit `8fa9be52`: branch `feat/hosted-llm-agent` cut from `Lawrens16/dev` at
+  `f1fe3f2b`; [PRD](2026-11-15-hosted-llm-fork-prd.md) drafted; [plan](phase-13-hosted-llm-agent-plan.md) saved;
+  [hosting research](2026-11-15-phase-13-pre-phase-research.md); fork section in `AGENTS.md` and the ledger.
+- Task 1 (feasibility probes, read-only): results below. Scripts and outputs are in the ignored
+  `C:/Coding-projects/bintanong_workspace/audit-evidence/p13-probes-20261115/`.
 
 ## Current Task
 
-Task 1: feasibility probes (read-only; no production code). PRD approval by the owner is pending and gates
-Task 2 onward.
+Paused for the owner: (1) PRD approval, which gates Task 2 onward; (2) topic-directory choice (A recommended).
 
 ## Repository State
 
-- Worktree `C:/Users/joel/orca/workspaces/Bintanong-personal/dev` (Orca workspace of the personal fork), branch
-  `feat/hosted-llm-agent`, not pushed. `origin` = `Lawrens16/Bintanong`; `upstream` = `bintanong420/Bintanong`
-  is never pushed to. `origin` held only `main` at phase start.
-- No file under `backend/`, `frontend/` or `tests/` changed in Task 0.
+- Worktree `C:/Users/joel/orca/workspaces/Bintanong-personal/dev`, branch `feat/hosted-llm-agent`, not pushed.
+  `origin` = `Lawrens16/Bintanong`; `upstream` = `bintanong420/Bintanong` is never pushed to.
+- No file under `backend/`, `frontend/` or `tests/` changed so far.
 
 ## Verification Evidence
 
-- `phase_state.py inspect` at start: State valid; no active phase, plan or checkpoint; latest handoff
-  `plans/phase-12-handoff.md`; working tree clean; can advance: yes.
-- `phase_state.py validate` after the Task 0 documents: State valid (result also in current progress).
-- Task 0 is documentation only: no tests apply (stated exception; validation is `phase_state.py validate`).
+- `phase_state.py validate` after Task 0: State valid, active phase 13.
+- Probe 1, chunks (`probe_chunks_memory.py`, `probe_row_caps.py`; anon key, GET only, 0 non-GET calls):
+  active research release `p12-research-faqsplit-20261030`, authorization `research-owner-20261029`,
+  560 chunks, 5 document versions. Readable chunk fields: `anchored, byte_sha256, chunk_id, chunk_type,
+  chunker_version, content_hash, content_review, document_id, edition_id, scope, section_path, source_label,
+  source_text, text, token_count, type_fields, version_id` plus spans. Snapshot is 4.38 MB as JSON.
+  **Defect found:** `load_document_snapshot` as written fails with `invalid reviewed context record`, because
+  an anon read returns at most 1000 rows per request and `source_spans` has 2529 (HTTP 206, `0-999/2529`), so
+  243 of 560 chunks get no or partial spans. With `source_spans` read in pages (limit/offset, ordered by
+  `chunk_id,span_order`) the unchanged loader passes and takes 2.12 s.
+- Probe 2, topic directory (`probe_topics.py`, `probe_topic_groups.py`, `probe_local_catalogue.py`):
+  `section_path` is empty on all rows; every row has `type_fields.reading_id`; 490 rows have
+  `service_group.logical_step_id`. Grouping by it (reading id stem otherwise) gives 159 groups with readable ids
+  such as `C-readmission`, `C-tor-copy`, `H-shifting`, `H-overload`; 43 groups (the Charter services) also carry
+  a printed service title field. The local sealed catalogue gives 145 subjects with ids of the same kind
+  (`charter_diploma`, `handbook_graduation`, `grade_completion`) and short claim phrases, no better titles.
+- Probe 3, memory (Windows working set / private MB, one process): Python start 15.7 / 9.3; FastAPI app
+  imports 84.2 / 65.6; + snapshot 104.5 / 82.9; + 39 ledgers 158.9 / 137.3; + 39 curriculum runtimes
+  185.9 / 163.6. Under the 400 MB line, so curricula can load at startup. Startup cost: ledgers 22.5 s
+  (39 reads), runtime build 28.5 s; 2132 catalog entries. Not measured: Linux RSS in the container and the
+  short-lived Janus worker subprocess per rule check (`backend/bintanong_symbolic/runtime.py:233`); Task 8.
+- Probe 4, Prolog image: `janus-swi==1.5.3` on PyPI ships only a Windows cp314 wheel and an sdist, so on Linux
+  it compiles against the installed SWI-Prolog and needs 9.1.12 or later. Debian bookworm's `swi-prolog-nox`
+  is 9.0.4, too old. The apt package is ruled out.
+- Probe 5, provider docs (read 15 Nov 2026):
+  - DeepSeek: base `https://api.deepseek.com`, `POST /chat/completions`, models `deepseek-flash` and
+    `deepseek-v4-pro` (`deepseek-v4-flash` is a deprecated alias). OpenAI tool shape; `function.arguments` is
+    a JSON string that "does not always generate valid JSON"; `tool` message needs `tool_call_id`;
+    `max_tokens`; `response_format` `json_object`. `tool_choice` `required` is rejected in thinking mode.
+    ([docs](https://api-docs.deepseek.com/), [chat completion](https://api-docs.deepseek.com/api/create-chat-completion))
+  - OpenAI: `https://api.openai.com/v1/chat/completions`; same tool shape; `max_tokens` is deprecated in
+    favour of `max_completion_tokens`. The function-calling guide says GPT-6 Astra and GPT-6.1 Sol need the
+    Responses API for tools and its Chat Completions examples use GPT-5.6 Terra; that model's exact id was not
+    shown. ([reference](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create),
+    [guide](https://developers.openai.com/api/docs/guides/function-calling))
+  - Gemini (OpenAI-compatible, beta): base `https://generativelanguage.googleapis.com/v1beta/openai/`;
+    example models `gemini-4-hydrogen`, `gemini-3.8-flash`; `tools` + `tool_choice: "auto"` supported.
+    ([docs](https://aistudio.google.com/docs/openai))
+  - Anthropic: `POST https://api.anthropic.com/v1/messages`, headers `x-api-key`, `anthropic-version:
+    2026-10-21`; `max_tokens` required; tools are `{name, description, input_schema}`; reply has `tool_use`
+    blocks with `stop_reason: "tool_use"`; results go back as `tool_result` blocks (`tool_use_id`) in a user
+    message. Current ids include `claude-haiku-5-5`, `claude-sonnet-5-5`, `claude-opus-5-5`.
+    ([docs](https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview))
 
 ## Versions and Digests
 
-- No dependency, lock, model or image change. Provider model ids, base URLs and the SWI-Prolog package choice
-  are Task 1 results and will be recorded here.
-- Shared venv: `C:/Coding-projects/bintanong_workspace/audit-evidence/p12-env-20261031/venv` (present).
+- No dependency, lock, model or image change. Local: SWI-Prolog 10.1.15 (Windows), `janus-swi` 1.5.3,
+  shared venv `C:/Coding-projects/bintanong_workspace/audit-evidence/p12-env-20261031/venv`.
+- Existing `docker/api.Dockerfile` builds SWI-Prolog 10.0.2 from source on `python:3.13.15-slim-bookworm`.
 
 ## Decisions
 
-- Owner, 15 Nov 2026: fork decisions (hosting, tool-using agent, keyword retrieval online, four providers
-  with DeepSeek first, four guards with guard 1 loosened, no Supabase change, original path untouched). Verbatim in
-  `plans/owner-decisions-ledger.md`.
-- Phase number: recorded as Phase 13 of this fork. The earlier Phase 13 (deployment) was cancelled on
-  29 Oct 2026 and never created; that cancellation stands for the original build.
-- Context consulted at phase start: thesis physical pp. 17-18 (printed 16-17, Scope and Limitations) and
+- Owner, 15 Nov 2026: fork decisions, verbatim in `plans/owner-decisions-ledger.md`.
+- Phase number: Phase 13 of this fork; the original build's Phase 13 deployment stays cancelled (29 Oct 2026).
+- Context consulted at phase start: thesis physical pp. 17-18 (printed 16-17) and
   `Context/bintanong_full_runtime_routing_architecture.png`. Discrepancies, all by owner fork decision:
   (1) the thesis names a localized Tagalog/English NLP model and SEA-LION-E5 vector search; the fork uses a
-  hosted LLM and, online, topic directory + keyword search judged by the LLM; (2) the routing diagram's
-  separate router / RAG / Symbolic / Hybrid boxes become one agent that chooses tools per turn; Prolog via
-  Janus still evaluates the rules; (3) output validation becomes four code guards. Unchanged: undergraduate
-  scope, excluded audiences, read-only advisory tool, no learning from chats, private uploads kept apart,
+  hosted LLM and, online, topic directory + keyword search judged by the LLM; (2) the diagram's separate
+  router / RAG / Symbolic / Hybrid boxes become one agent that chooses tools per turn; Prolog via Janus still
+  evaluates the rules; (3) output validation becomes four code guards. Unchanged: undergraduate scope, excluded
+  audiences, read-only advisory tool, no learning from chats, private uploads kept apart,
   English/Filipino/Taglish input. The fork's results do not inherit the thesis evaluation figures.
+- Task 3/6 design consequence of probe 1: the agent app reads `source_spans` in pages through a small
+  read-only wrapper around the storage client (new code in the fork), then calls the unchanged
+  `load_document_snapshot`. No edit to the original loader and no Supabase setting change.
+- Task 4 consequence of probe 3: load all 39 curricula at startup (no lazy loading needed on the memory
+  evidence so far); re-check on Linux in Task 8.
+- Task 8 consequence of probe 4: keep a SWI-Prolog 10.x build stage as in `docker/api.Dockerfile` (proven),
+  or copy SWI-Prolog from the official `swipl` image if a local build shows it works and is faster; the
+  `janus-swi` sdist is compiled in a build stage. Chosen at the local image build.
+- Task 2 defaults proposed from probe 5: `deepseek` -> `deepseek-flash`; `gemini` -> `gemini-3.8-flash`;
+  `anthropic` -> `claude-haiku-5-5`; `openai` -> the GPT-5.6 Terra id, confirmed from the models list when the
+  owner supplies a key (not guessed). OpenAI requests send `max_completion_tokens`; the others `max_tokens`.
+- Topic directory: option A (derive from chunk rows: group id + printed service title where present) is
+  recommended over option B (derived file from the local catalogue as a Render secret file), since B's
+  labels are no better and A needs no extra file. **Owner choice pending.**
 
 ## Known Failures or Blockers
 
-- None. Full-suite environmental baseline to compare against later: 82 failures and 9 collection errors.
-- Render free memory figure has one unverified conflicting report (256 MB); measured in Task 1, re-read at deploy.
+- Waiting on the owner for PRD approval and the topic-directory choice.
+- Render free memory has one unverified conflicting report (256 MB); re-read in the dashboard at deploy.
+- Full-suite environmental baseline to compare against later: 82 failures and 9 collection errors.
 
 ## Next Action
 
-Run the Task 1 probes (chunks, topic directory, memory, Prolog image, provider docs) from the ignored
-`C:/Coding-projects/bintanong_workspace/audit-evidence/p13-probes-20261115/`, record each result here, and
-show the owner the topic-directory samples and the PRD summary.
+After PRD approval: start Task 2 (providers and settings) on `feat/agent-providers`, RED first with
+`tests/test_agent_providers.py` and `tests/test_agent_settings.py`; Tasks 3 and 4 may run beside it.
 
 ## Do Not Repeat
 
-- Phase start inspection, thesis/PNG reading, hosting research, PRD drafting and branch creation are done.
-- Do not re-ask the 15 Nov fork decisions.
+- Phase start inspection, thesis/PNG reading, hosting research, PRD drafting, branch creation and the five
+  Task 1 probes are done. Do not re-ask the 15 Nov fork decisions.
+- Do not call `load_document_snapshot` with an unpaged client against the hosted release; it fails as above.
