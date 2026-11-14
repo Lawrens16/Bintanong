@@ -1,9 +1,21 @@
 # Current progress
 
-Updated 6 November 2026. Development: `p12-dev` / `p12-post-gathering-fixes`.
-Last full snapshot before condensation: `d2ad9fef` (recover with `git show`).
-Gathering checkout and owner USG notes remain separate. No numbered phase is active;
-Phase 12 research/software write-up is complete with disclosures; Phase 13 is cancelled.
+Updated 15 November 2026. Active: Phase 13 hosted-LLM agent (personal fork), branch `feat/hosted-llm-agent`.
+Last full snapshot before condensation: `d2ad9fef`; before the Phase 13 entries: `f1fe3f2b` (recover with `git show`).
+Gathering checkout and owner USG notes remain separate. Phase 12 research/software write-up is complete with
+disclosures; the original build's Phase 13 deployment stays cancelled.
+
+## Phase 13: hosted-LLM agent fork (15 Nov)
+
+Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-llm-agent-plan.md),
+[checkpoint](../phase-13-checkpoint.md), [PRD draft](../2026-11-15-hosted-llm-fork-prd.md),
+[hosting research](../2026-11-15-phase-13-pre-phase-research.md).
+- Task 0 done: branch cut from `Lawrens16/dev` at `f1fe3f2b` (not pushed); PRD drafted; plan and checkpoint
+  created; fork decisions recorded in `AGENTS.md` and the ledger; thesis pp. 17-18 and routing PNG re-read,
+  discrepancies recorded in the checkpoint. Documentation only; no backend, frontend or test file changed.
+- Verification: `phase_state.py inspect` valid at start; `phase_state.py validate` valid after the documents.
+- Waiting on the owner: PRD approval (gates Task 2 onward). No Supabase change; push only to `origin`.
+- **Next action:** Task 1 read-only feasibility probes; record results in the checkpoint.
 
 ## Delivered repairs
 
@@ -76,7 +88,7 @@ precision .896, context recall .754 (optimistic), factual correctness precision 
 8 Nov: Query 1 three-language worked example tried (3a5f6084) and reverted; owner keeps the Query 9
 version (af3836e8), copied to for_manuscript/Benchmarks_results/RAGAS.pdf with the BATAYAN section.
 
-## Next action
+## Earlier continuation (6 Nov, original build)
 
 Index committed `11b2e015`; 3217 proxy chat returned HTTP200 with `system_information`.
 [Shifting repair](../2026-11-06-program-shifting-repair.md): exact “Pano po lumipat ng kurso?”

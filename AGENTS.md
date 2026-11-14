@@ -287,6 +287,39 @@ permission or authorization to execute institutional rules in Phase 06.
   source/scope rules for speed. Bound the research to the phase; it is not a reason to delay
   indefinitely or reopen settled decisions.
 
+## Fork: hosted-LLM agent, owner decisions 15 November 2026
+
+- Applies to this personal fork (`origin` = `Lawrens16/Bintanong`) and its Phase 13 only. Read
+  `plans/phase-13-hosted-llm-agent-plan.md`, its checkpoint and `plans/2026-11-15-hosted-llm-fork-prd.md`.
+  Full record: `plans/owner-decisions-ledger.md` (15 Nov 2026 entry). Do not re-ask these decisions.
+- In this fork these decisions supersede the Gemma-only, strict-guard and thesis-technology rules above
+  (local Gemma/Bintu answer path, vector-only retrieval, host-written verdict wording, no hosting). The new
+  path is one tool-using chat agent on a hosted LLM API: DeepSeek first, then GPT, Gemini, Claude. Frontend on
+  Vercel Hobby, backend on Render free; $0, no card. Online retrieval is topic directory + keyword search over
+  the same Supabase chunks, judged by the LLM; vector search stays where the embedder fits.
+- Database rule, verbatim: **No Supabase change.** No migrations, no writes, no RPC that writes, no
+  service-role key read by the agent app. Reads use the anon key only. Supabase MCP is used for read-only
+  checks only.
+- Original path untouched: no behaviour change in `bintanong_routing`, `bintanong_generation`,
+  `bintanong_orchestration`, `research_app.py`, `research.py`. New code imports from them.
+- The four code guards, verbatim:
+  1. **Eligibility comes from the reviewed rules (loosened).** Before answering "can I take X", the agent must
+     have called the curriculum tool this turn. The tool returns the printed prerequisite rule and the Prolog
+     evaluation; the LLM reads them and decides and words the answer itself. Course names are matched
+     forgivingly ("cc5", "CC-5", "cc 5/l", a title) and the LLM picks from candidates, so a missing space or a
+     dash no longer ends in "unknown". No byte-for-byte host verdict line and no wording regex.
+  2. **Private data never leaks.** Uploaded or typed grades stay in the owning session; code checks they never
+     appear in citations, source cards or logs (existing `foreign_ids`).
+  3. **Policy answers cite a retrieved chunk.** A policy/procedure answer must cite at least one chunk fetched
+     this turn. Unknown or missing citations get one retry, then an honest "couldn't verify, ask the office".
+  4. **Excluded-audience block.** Medicine, Law, graduate, laboratory school and staff-only questions get the
+     fixed undergraduate-scope notice from code (existing `EXCLUDED_PROGRAM_CUES`).
+- Unchanged: undergraduate scope, read-only advisory boundary, source-gap and unknown-versus-unmet rules,
+  English/Taglish replies, private-upload isolation, TDD, Conventional Commits without AI attribution. Never
+  push to `upstream` (`bintanong420/Bintanong`). Creating Render/Vercel projects, the first push of a new
+  branch and deploys are confirmed with the owner when they happen. This is not institutional approval, and
+  the fork's results do not inherit the thesis evaluation figures.
+
 ## Settled owner decisions
 
 - Settled Phase 05/06 source-review, source-intake and benchmark decisions (review01-03,
