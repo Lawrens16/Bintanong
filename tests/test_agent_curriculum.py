@@ -90,8 +90,10 @@ def test_prerequisite_check_reports_met_not_met_and_unknown_separately(tools):
     assert set(met) == {'course', 'printed_rule', 'evaluation', 'unmet', 'unknown_facts', 'limits'}
     assert (met['evaluation'], not_met['evaluation'], unknown['evaluation']) == ('met', 'not_met', 'unknown')
     assert met['course'] == 'SYN 104' and met['printed_rule'] == 'SYN 100'
-    assert not_met['unmet'] and not unknown['unmet']
-    assert unknown['unknown_facts'] and not met['unknown_facts']
+    assert met['unmet'] == [] and met['unknown_facts'] == []
+    assert not_met['unmet'] == [{'course': 'SYN 100', 'reason': 'not_completed'}] and not_met['unknown_facts'] == []
+    assert unknown['unmet'] == [] and unknown['unknown_facts'] == [
+        {'course': 'SYN 100', 'reason': 'completion_unknown'}]
     json.dumps([met, not_met, unknown])
 
 
@@ -148,3 +150,41 @@ def test_unreviewed_or_missing_course_and_foreign_curriculum_return_error_codes(
 
     with pytest.raises(ValueError, match='something_else'):
         run(curriculum_module().CurriculumTools(Broken(), ()).course_facts('c', 'p', 'x'))
+
+
+def test_unknown_facts_name_every_missing_course_by_printed_code(tools):
+    # Y needs X and AUX; with BASE passed and nothing else stated, both are unknown.
+    result = run(tools.prerequisite_check(SYNTHETIC, 'program-synthetic', course_id('Y'), (fact('BASE', 'passed'),)))
+    assert result['unknown_facts'] == [{'course': 'SYN 101', 'reason': 'completion_unknown'},
+                                       {'course': 'SYN 104', 'reason': 'completion_unknown'}]
+
+
+def test_course_without_printed_code_keeps_its_raw_id(tools):
+    bare = curriculum_module().CurriculumTools(tools.symbolic, ())
+    result = run(bare.prerequisite_check(SYNTHETIC, 'program-synthetic', course_id('X'), ()))
+    assert result['unknown_facts'] == [{'course': course_id('BASE'), 'reason': 'completion_unknown'}]
+
+
+def test_bad_model_arguments_return_error_codes(tools):
+    assert run(tools.term_courses(SYNTHETIC, 'program-synthetic', 9, 'first_semester')) == {
+        'error': 'invalid_term_input'}
+    assert run(tools.term_courses(SYNTHETIC, 'program-synthetic', 2, 'nonsense')) == {'error': 'invalid_term_input'}
+    assert run(tools.course_facts(SYNTHETIC, 'program-synthetic', '')) == {'error': 'invalid_arguments'}
+    assert run(tools.course_facts(SYNTHETIC, 'program-synthetic', 'x' * 500)) == {'error': 'invalid_arguments'}
+
+
+def test_affected_courses_unknown_conditions_use_printed_codes(tools):
+    real = run(tools.symbolic.execute(
+        curriculum_module().PredicateRequest.parse({'predicate': 'list_affected_courses', 'inputs': [
+            {'name': 'curriculum_id', 'value': SYNTHETIC, 'fact_ref': None},
+            {'name': 'course_id', 'value': course_id('BASE'), 'fact_ref': None}]}),
+        curriculum_module().RequestContext.parse(dict(session_id=SESSION, request_id='req-t',
+            program_id='program-synthetic', curriculum_id=SYNTHETIC))))
+
+    class Unresolved:
+        async def execute(self, request, context):
+            return real.model_copy(update=dict(unknown_conditions=('rule_unresolved:' + course_id('X'),)))
+
+    shown = run(curriculum_module().CurriculumTools(Unresolved(), tools.catalog).affected_courses(
+        SYNTHETIC, 'program-synthetic', course_id('BASE')))
+    assert shown['unknown_conditions'] == [{'course': 'SYN 104', 'reason': 'rule_unresolved'}]

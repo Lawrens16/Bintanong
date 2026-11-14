@@ -8,11 +8,14 @@ import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 
+from pydantic import ValidationError
+
 from ..bintanong_contracts.runtime import PredicateRequest
 from ..bintanong_routing.contracts import RequestContext
 from ..bintanong_symbolic.bundle import BLANK_CELL
 
 MISSING_CURRICULUM = 'curriculum_not_in_release'
+KNOWN_ERRORS = (MISSING_CURRICULUM, 'invalid_term_input')  # predictable results of bad model arguments
 FALLBACK_SESSION = 'sess-agent-tools'  # only labels a request that carries no session facts
 _EVALUATION = {'eligible': 'met', 'ineligible': 'not_met'}  # every other outcome stays unknown
 _LOOKUP_ERRORS = {'not_found': 'course_not_found', 'not_reviewed': 'course_not_reviewed',
@@ -64,20 +67,28 @@ class CurriculumTools:
         return self._codes.get(course_id, course_id)
 
     async def _execute(self, predicate, curriculum_id, program_id, facts=(), **inputs):
-        """The adapter result, or None when the curriculum is not in the release."""
+        """The adapter result, or an {'error': code} dict for a known, recoverable failure."""
         names = {'curriculum_id': curriculum_id, **inputs}
-        request = PredicateRequest.parse({'predicate': predicate, 'inputs': [
-            {'name': name, 'value': value, 'fact_ref': None} for name, value in names.items()]})
         facts = tuple(facts)
-        context = RequestContext.parse(dict(session_id=facts[0].session_id if facts else FALLBACK_SESSION,
-            request_id='req-agent-tool', program_id=program_id, curriculum_id=curriculum_id,
-            facts=[f.model_dump(mode='json') for f in facts]))
+        try:
+            request = PredicateRequest.parse({'predicate': predicate, 'inputs': [
+                {'name': name, 'value': value, 'fact_ref': None} for name, value in names.items()]})
+            context = RequestContext.parse(dict(session_id=facts[0].session_id if facts else FALLBACK_SESSION,
+                request_id='req-agent-tool', program_id=program_id, curriculum_id=curriculum_id,
+                facts=[f.model_dump(mode='json') for f in facts]))
+        except ValidationError:
+            return {'error': 'invalid_arguments'}
         try:
             return await self.symbolic.execute(request, context)
         except ValueError as exc:
-            if str(exc) != MISSING_CURRICULUM:
+            if str(exc) not in KNOWN_ERRORS:
                 raise
-            return None
+            return {'error': str(exc)}
+
+    def _condition(self, text):
+        """'reason:course-id' as {'course': printed code, 'reason': reason}; other text stays as the reason."""
+        reason, _, course_id = text.partition(':')
+        return {'course': self._code(course_id), 'reason': reason} if course_id else {'course': None, 'reason': text}
 
     def _printed_rule(self, view) -> str:
         kind = view.kind
@@ -93,10 +104,11 @@ class CurriculumTools:
         return view.reason or 'unresolved printed condition'
 
     async def prerequisite_check(self, curriculum_id, program_id, course_id, facts) -> dict:
+        """All facts must belong to one session; the caller owns session scoping."""
         result = await self._execute('check_prerequisite_eligibility', curriculum_id, program_id, facts,
                                      course_id=course_id)
-        if result is None:
-            return {'error': MISSING_CURRICULUM}
+        if isinstance(result, dict):
+            return result
         decision = result.decision
         limits = [] if decision.rule_coverage == 'verified' else [f'rule_coverage: {decision.rule_coverage}']
         limits += [f'conflict: {c}' for c in decision.unresolved_conflicts]
@@ -107,14 +119,14 @@ class CurriculumTools:
         return {'course': self._code(course_id),
                 'printed_rule': None if result.requirement is None else self._printed_rule(result.requirement),
                 'evaluation': _EVALUATION.get(decision.outcome, 'unknown'),
-                'unmet': list(decision.violated_conditions),
-                'unknown_facts': [*decision.missing_facts, *decision.unknown_conditions],
+                'unmet': [self._condition(c) for c in decision.violated_conditions],
+                'unknown_facts': [self._condition(c) for c in (*decision.missing_facts, *decision.unknown_conditions)],
                 'limits': limits}
 
     async def _printed_courses(self, predicate, curriculum_id, program_id, **inputs):
         result = await self._execute(predicate, curriculum_id, program_id, **inputs)
-        if result is None:
-            return {'error': MISSING_CURRICULUM}, ()
+        if isinstance(result, dict):
+            return result, ()
         if result.status != 'complete':
             return {'error': _LOOKUP_ERRORS[result.status]}, ()
         return None, [dict(course_id=c.course_id, code=c.code, title=c.title, units=dict(c.units),
@@ -132,11 +144,11 @@ class CurriculumTools:
 
     async def affected_courses(self, curriculum_id, program_id, course_id) -> dict:
         result = await self._execute('list_affected_courses', curriculum_id, program_id, course_id=course_id)
-        if result is None:
-            return {'error': MISSING_CURRICULUM}
+        if isinstance(result, dict):
+            return result
         if result.status in ('unsupported', 'error'):
             return {'error': result.error_code or 'dependency_unsupported'}
         return {'course': self._code(course_id), 'complete': result.status == 'complete',
                 'affected': [self._code(c) for c in result.course_ids],
-                'unknown_conditions': list(result.unknown_conditions),
+                'unknown_conditions': [self._condition(c) for c in result.unknown_conditions],
                 'printed_conditions': [[self._code(c), text] for c, text in result.printed_conditions]}
