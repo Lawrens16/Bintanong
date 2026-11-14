@@ -2,9 +2,9 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 5
+sequence: 6
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: fef1c190
+head_commit: eba1d049
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T14:00:00+08:00
 ---
@@ -32,10 +32,16 @@ updated_at: 2026-11-15T14:00:00+08:00
   11,646 characters; sample questions (TOR request, removal exam, overload, shifting) rank the expected
   Charter/Handbook passages first. Passage text is built from the chunk's field list, not through
   `render_reviewed_policy_context` (the paged loader already validates each chunk with it).
+- Task 4 (curriculum tools), commits `bfe8508d`, `d08fd6e6`, `31da7477`, merged and tagged `agent-m4`:
+  `backend/bintanong_agent/curriculum.py`, `tests/test_agent_curriculum.py`. RED 8 failed + 5 errors (module
+  missing), GREEN 13; review + a read-only run on the real curricula found internal course ids in the
+  unmet/unknown lists and uncaught bad-argument errors; fixed test-first, re-review clean. Controller run at
+  the merged head: the five agent test files pass. Real curricula (`probe_curriculum_real.py`): "cc5",
+  "CC-5", "cc 5/l" all resolve to CC 5/L; a rule check takes about 0.3 s; results name printed codes.
 
 ## Current Task
 
-Task 4 (curriculum tools), then Task 5. The owner approved the PRD and chose topic-directory
+Task 5 (tools, prompt, guards, agent loop). The owner approved the PRD and chose topic-directory
 option A on 15 Nov 2026.
 
 ## Repository State
@@ -132,7 +138,7 @@ option A on 15 Nov 2026.
 
 ## Next Action
 
-Task 4 (curriculum tools) on `feat/agent-curriculum-tools`, tests first; then Task 5.
+Task 5 (tools, prompt, guards, agent loop) on `feat/agent-loop-guards`, tests first; then Task 6.
 
 ## Do Not Repeat
 
