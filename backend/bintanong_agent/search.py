@@ -13,7 +13,8 @@ from .corpus import Corpus, Passage
 
 MAX_TOP_K = 8
 BM25_K1, BM25_B = 1.5, 0.75
-MIN_SIMILARITY = 0.5  # the retrieval default (RetrievalSettings.min_similarity)
+MIN_SIMILARITY = 0.25  # as the research runtime (bintanong_runtime/research.py): RetrievalSettings(min_similarity=.25)
+DOCUMENT_SCOPE = ('audience:undergraduate',)  # the research runtime's document_scope
 
 
 def _clamp(top_k: int) -> int:
@@ -62,7 +63,8 @@ class VectorSearch:
     def _read(self, query: str, top_k: int) -> dict:
         params = dict(p_release_id=self._release_id, p_config=configuration_identity(self._encoder.config),
                       query_embedding=list(self._encoder.encode(query)), p_top_k=top_k,
-                      p_min_similarity=MIN_SIMILARITY)
+                      p_min_similarity=MIN_SIMILARITY, p_scope=list(DOCUMENT_SCOPE), p_entity_hints=[],
+                      p_version_ids=list(self._corpus.version_ids))
         return self._client.rpc('retrieve_context', params, role='runtime')
 
     async def search(self, query: str, *, top_k: int = MAX_TOP_K) -> tuple[Passage, ...]:

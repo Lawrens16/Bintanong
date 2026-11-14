@@ -2,6 +2,8 @@ import asyncio
 import importlib
 import json
 
+import pytest
+
 
 def corpus_module():
     return importlib.import_module('backend.bintanong_agent.corpus')
@@ -77,3 +79,15 @@ def test_vector_search_passes_stored_embedding_configuration():
     assert params['p_release_id'] == 'rel-1' and params['p_top_k'] == 2
     assert params['p_config']['model_revision'] == 'r' and params['p_config']['dimension'] == 2
     assert params['query_embedding'] == [1.0, 0.0]
+    assert params['p_min_similarity'] == 0.25
+    assert params['p_scope'] == ['audience:undergraduate']
+    assert params['p_entity_hints'] == []
+    assert params['p_version_ids'] == ['v1']
+
+
+def test_vector_search_raises_on_non_ok_status():
+    client = FakeClient()
+    client.rpc = lambda name, params, role=None: {'status': 'release_changed'}
+    search = search_module().VectorSearch(make_corpus(), FakeEncoder(), client, 'rel-1')
+    with pytest.raises(ValueError, match='release_changed'):
+        asyncio.run(search.search('curfew'))

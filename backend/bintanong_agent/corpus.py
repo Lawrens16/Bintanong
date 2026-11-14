@@ -71,8 +71,8 @@ def _topic_label(topic_id: str, chunks: list[dict]) -> str:
 
 
 class Corpus:
-    def __init__(self, passages: tuple[Passage, ...], topics: tuple[Topic, ...]):
-        self.passages, self.topics = passages, topics
+    def __init__(self, passages: tuple[Passage, ...], topics: tuple[Topic, ...], version_ids: tuple[str, ...] = ()):
+        self.passages, self.topics, self.version_ids = passages, topics, version_ids
         self._by_short_id = {p.short_id: p for p in passages}
 
     @classmethod
@@ -87,7 +87,7 @@ class Corpus:
         for topic_id, group in by_topic.items():
             for chunk in group:
                 type_fields = chunk['type_fields']
-                limits = tuple(_limit_text(limit) for limit in type_fields.get('source_limits', []))
+                limits = tuple(text for text in map(_limit_text, type_fields.get('source_limits', [])) if text)
                 spans = chunk.get('spans') or []
                 passages.append(Passage(
                     short_ids[chunk['chunk_id']], chunk['chunk_id'], labels[topic_id], chunk['source_label'],
@@ -95,7 +95,8 @@ class Corpus:
                     tuple(short_ids[n] for n in type_fields.get('required_neighbor_chunk_ids', []) if n in short_ids)))
         topics = tuple(Topic(topic_id, labels[topic_id], tuple(short_ids[c['chunk_id']] for c in group))
                        for topic_id, group in sorted(by_topic.items()))
-        return cls(tuple(sorted(passages, key=lambda p: p.short_id)), topics)
+        return cls(tuple(sorted(passages, key=lambda p: p.short_id)), topics,
+                   tuple(sorted({chunk['version_id'] for chunk in chunks})))
 
     def get(self, short_id: str) -> Passage:
         return self._by_short_id[short_id]

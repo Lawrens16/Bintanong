@@ -71,3 +71,10 @@ def test_topic_falls_back_to_reading_id_without_trailing_number():
     snapshot = {'versions': {}, 'chunks': [make_chunk('c1', 'F01', {'body': 'x'}),
                                            make_chunk('c2', '12', {'body': 'y'})]}
     assert [t.topic_id for t in corpus_module().Corpus.from_snapshot(snapshot).topics] == ['12', 'F']
+
+
+def test_empty_source_limit_strings_are_dropped():
+    chunk = make_chunk('c1', 'F01', {'body': 'x'}, limits=('', 'Real limit.'))
+    passage = corpus_module().Corpus.from_snapshot({'versions': {}, 'chunks': [chunk]}).get('C001')
+    assert passage.limits == ('Real limit.',)
+    assert passage.text.splitlines()[-2:] == ['Source limits:', '- Real limit.']
