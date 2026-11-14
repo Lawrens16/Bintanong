@@ -2,9 +2,9 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 4
+sequence: 5
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: 5189226f
+head_commit: fef1c190
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T14:00:00+08:00
 ---
@@ -24,10 +24,18 @@ updated_at: 2026-11-15T14:00:00+08:00
   `tests/test_routing_transport.py` 23 passed (implementer's runs). Task review: spec compliant, approved,
   minors deferred to the final review. `openai` has no default model (`llm_model_required`).
   Milestone branches are merged locally; PRs on `origin` wait for the owner's go-ahead to push.
+- Task 3 (corpus and search), commits `e7bd9912` + fix `c64af42f`, merged and tagged `agent-m3`:
+  `backend/bintanong_agent/{corpus,search}.py`, `tests/test_agent_corpus.py`, `tests/test_agent_search.py`.
+  RED 9 failed (modules missing), GREEN 9; review found the vector wrapper used min similarity 0.5 and
+  omitted scope/version filters; fixed test-first (RED 2 failed, GREEN 11 passed), re-review clean.
+  Read-only run on the real release (`probe_corpus_real.py`): 560 passages, 171 topics, topic directory
+  11,646 characters; sample questions (TOR request, removal exam, overload, shifting) rank the expected
+  Charter/Handbook passages first. Passage text is built from the chunk's field list, not through
+  `render_reviewed_policy_context` (the paged loader already validates each chunk with it).
 
 ## Current Task
 
-Task 3 (corpus and search), then Task 4. The owner approved the PRD and chose topic-directory
+Task 4 (curriculum tools), then Task 5. The owner approved the PRD and chose topic-directory
 option A on 15 Nov 2026.
 
 ## Repository State
@@ -124,7 +132,7 @@ option A on 15 Nov 2026.
 
 ## Next Action
 
-Task 3 (corpus and search) on `feat/agent-corpus-search`, tests first; then Task 4.
+Task 4 (curriculum tools) on `feat/agent-curriculum-tools`, tests first; then Task 5.
 
 ## Do Not Repeat
 
