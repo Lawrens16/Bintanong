@@ -1,11 +1,11 @@
 ---
 artifact: phase-checkpoint
 phase: 13
-status: paused
-sequence: 2
+status: in_progress
+sequence: 3
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: 8fa9be52
-working_tree: this checkpoint and current progress staged for the Task 1 commit; head_commit is that commit's parent
+head_commit: 03afd567
+working_tree: approval records staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T14:00:00+08:00
 ---
 
@@ -21,7 +21,8 @@ updated_at: 2026-11-15T14:00:00+08:00
 
 ## Current Task
 
-Paused for the owner: (1) PRD approval, which gates Task 2 onward; (2) topic-directory choice (A recommended).
+Task 2 (providers and settings), then Tasks 3 and 4. The owner approved the PRD and chose topic-directory
+option A on 15 Nov 2026.
 
 ## Repository State
 
@@ -106,17 +107,18 @@ Paused for the owner: (1) PRD approval, which gates Task 2 onward; (2) topic-dir
   owner supplies a key (not guessed). OpenAI requests send `max_completion_tokens`; the others `max_tokens`.
 - Topic directory: option A (derive from chunk rows: group id + printed service title where present) is
   recommended over option B (derived file from the local catalogue as a Render secret file), since B's
-  labels are no better and A needs no extra file. **Owner choice pending.**
+  labels are no better and A needs no extra file. **Owner chose A ("yeah do Option A"), 15 Nov 2026.**
+- Owner, 15 Nov 2026: PRD approved. The fork is separate from the thesis and not used in the final defense;
+  it may later be offered publicly. Verbatim in the ledger.
 
 ## Known Failures or Blockers
 
-- Waiting on the owner for PRD approval and the topic-directory choice.
 - Render free memory has one unverified conflicting report (256 MB); re-read in the dashboard at deploy.
 - Full-suite environmental baseline to compare against later: 82 failures and 9 collection errors.
 
 ## Next Action
 
-After PRD approval: start Task 2 (providers and settings) on `feat/agent-providers`, RED first with
+Start Task 2 (providers and settings) on `feat/agent-providers`, RED first with
 `tests/test_agent_providers.py` and `tests/test_agent_settings.py`; Tasks 3 and 4 may run beside it.
 
 ## Do Not Repeat

@@ -8,6 +8,15 @@ AGENTS.md, current progress or dated review records supersede older entries wher
 
 ## Owner decisions to preserve across CLI sessions
 
+- 15 November 2026 (fork purpose, PRD and topic directory). Owner: "this will be separate from the thesis, like
+  it will not be used in the final defense of ours since it will not be implementing the algorithsm such as knn
+  and cosign but it will be a working version that may be used in the public to contribute 'something' to the
+  university". "I approve the PRD." "yeah do Option A." So: the fork is not thesis evidence and is not part of
+  the final defense; its results are never reported as thesis results. The PRD
+  `plans/2026-11-15-hosted-llm-fork-prd.md` is approved. The topic directory is derived from the chunk rows
+  (group id plus the printed service title where present); no derived catalogue file. Possible public use is
+  the owner's intent, not university approval; each deploy is still confirmed with the owner.
+
 - 15 November 2026 (fork: hosted-LLM agent, Phase 13 of the personal fork `Lawrens16/Bintanong`). The owner
   approved the plan now saved as `plans/phase-13-hosted-llm-agent-plan.md` and asked to implement it from
   Task 0. Decisions from that planning session, as recorded in the approved plan:

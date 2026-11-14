@@ -19,9 +19,9 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
   return 1000 rows at most; process memory about 186 MB with all 39 curricula; chunk rows give 159 topic
   groups; `janus-swi` needs SWI-Prolog 9.1.12+ so Debian's apt package (9.0.4) is out; provider base URLs
   and model ids recorded.
-- Waiting on the owner: PRD approval (gates Task 2 onward) and the topic-directory choice (A recommended).
-  No Supabase change; push only to `origin`.
-- **Next action:** after PRD approval, Task 2 providers and settings, tests first.
+- Owner, 15 Nov: PRD approved; topic directory option A (from chunk rows); the fork is separate from the
+  thesis and not used in the final defense. No Supabase change; push only to `origin`.
+- **Next action:** Task 2 providers and settings, tests first; Tasks 3 and 4 beside it.
 
 ## Delivered repairs
 

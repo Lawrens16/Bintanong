@@ -289,6 +289,9 @@ permission or authorization to execute institutional rules in Phase 06.
 
 ## Fork: hosted-LLM agent, owner decisions 15 November 2026
 
+- Owner, 15 Nov 2026: the fork is separate from the thesis and is not used in the final defense (it does not
+  implement the thesis k-NN/cosine retrieval). It is a working version that may later be offered publicly.
+  Never report its results as thesis results. PRD approved; topic directory comes from the chunk rows.
 - Applies to this personal fork (`origin` = `Lawrens16/Bintanong`) and its Phase 13 only. Read
   `plans/phase-13-hosted-llm-agent-plan.md`, its checkpoint and `plans/2026-11-15-hosted-llm-fork-prd.md`.
   Full record: `plans/owner-decisions-ledger.md` (15 Nov 2026 entry). Do not re-ask these decisions.

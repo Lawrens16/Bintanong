@@ -1,6 +1,6 @@
 # PRD: Bintanong fork with a hosted-LLM chat agent
 
-Status: draft for owner approval, 15 November 2026. Approval gates Task 2 onward of the
+Status: approved by the owner, 15 November 2026 ("I approve the PRD."). It gated Task 2 onward of the
 [Phase 13 plan](phase-13-hosted-llm-agent-plan.md). [Hosting research](2026-11-15-phase-13-pre-phase-research.md).
 
 ## 1. Summary
@@ -90,15 +90,15 @@ Replies: English question -> English; Filipino/Taglish -> Taglish.
 
 - Assumed: the backend with 39 curriculum bundles and 560 chunks fits in 512 MB (measured in Task 1; if not,
   curricula load on first use).
-- Assumed: chunk rows alone give usable topic names. If not, a small derived topic file is used; the owner
-  picks after seeing samples (Task 1).
+- Settled (owner, 15 Nov): the topic directory comes from the chunk rows (option A); no derived file.
 - Assumed: SWI-Prolog installs on the Render image without a source build (Task 1).
 - Open: which provider keys besides DeepSeek the owner will supply.
 - Known risk: keyword search can miss a chunk that shares no words with the question.
 - Known risk: with guard 1 loosened, the model can word an eligibility reply wrongly; every eligibility
   answer in the live check is read against the tool result.
-- This fork departs from the thesis-named local model and vector-only retrieval. It is a fork decision by
-  the owner, not a change to the thesis system or its evaluation figures.
+- This fork departs from the thesis-named local model and vector-only retrieval (no k-NN or cosine search
+  online). Owner, 15 Nov: it is separate from the thesis and will not be used in the final defense; it is a
+  working version that may later be offered publicly as a contribution to the university.
 
 ## 8. Release
 
