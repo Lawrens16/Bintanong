@@ -183,7 +183,7 @@ def test_affected_courses_unknown_conditions_use_printed_codes(tools):
 
     class Unresolved:
         async def execute(self, request, context):
-            return real.model_copy(update=dict(unknown_conditions=('rule_unresolved:' + course_id('X'),)))
+            return real.model_copy(update=dict(status='partial', unknown_conditions=('rule_unresolved:' + course_id('X'),)))
 
     shown = run(curriculum_module().CurriculumTools(Unresolved(), tools.catalog).affected_courses(
         SYNTHETIC, 'program-synthetic', course_id('BASE')))
