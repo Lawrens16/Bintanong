@@ -2,10 +2,10 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 3
+sequence: 4
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: 03afd567
-working_tree: approval records staged for commit; head_commit is that commit's parent
+head_commit: 5189226f
+working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T14:00:00+08:00
 ---
 
@@ -18,10 +18,16 @@ updated_at: 2026-11-15T14:00:00+08:00
   [hosting research](2026-11-15-phase-13-pre-phase-research.md); fork section in `AGENTS.md` and the ledger.
 - Task 1 (feasibility probes, read-only): results below. Scripts and outputs are in the ignored
   `C:/Coding-projects/bintanong_workspace/audit-evidence/p13-probes-20261115/`.
+- Task 2 (providers and settings), commit `136de9bb`, merged to `feat/hosted-llm-agent` and tagged `agent-m2`:
+  `backend/bintanong_agent/{__init__,providers,settings}.py`, `tests/test_agent_providers.py`,
+  `tests/test_agent_settings.py`. RED 32 failed (module missing), GREEN 32 passed; existing
+  `tests/test_routing_transport.py` 23 passed (implementer's runs). Task review: spec compliant, approved,
+  minors deferred to the final review. `openai` has no default model (`llm_model_required`).
+  Milestone branches are merged locally; PRs on `origin` wait for the owner's go-ahead to push.
 
 ## Current Task
 
-Task 2 (providers and settings), then Tasks 3 and 4. The owner approved the PRD and chose topic-directory
+Task 3 (corpus and search), then Task 4. The owner approved the PRD and chose topic-directory
 option A on 15 Nov 2026.
 
 ## Repository State
@@ -118,8 +124,7 @@ option A on 15 Nov 2026.
 
 ## Next Action
 
-Start Task 2 (providers and settings) on `feat/agent-providers`, RED first with
-`tests/test_agent_providers.py` and `tests/test_agent_settings.py`; Tasks 3 and 4 may run beside it.
+Task 3 (corpus and search) on `feat/agent-corpus-search`, tests first; then Task 4.
 
 ## Do Not Repeat
 
