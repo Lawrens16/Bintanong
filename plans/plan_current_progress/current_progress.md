@@ -35,7 +35,9 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
 - Live check (15 Nov): 14 DeepSeek turns, all key facts present in cited passages, eligibility answers follow
   the rule results. Thinking off: $0.0136 at peak for 14 turns (about $0.001 per question), 88% cached,
   1.5-7 s; thinking on cost 71% more for slightly fuller wording. Thinking stays off. Not an accuracy claim.
-- **Next action:** Task 8 part 2: container image and `render.yaml`, then a local browser run.
+- Container image + `render.yaml` done (`4f6a5e0d`): image runs under a 512 MB cap at about 158 MB, ready in 41 s,
+  answers over HTTP in 4-5 s. Nothing pushed or deployed.
+- **Next action:** local browser run; then, with the owner, first push to `origin` and Render/Vercel setup.
 
 ## Delivered repairs
 

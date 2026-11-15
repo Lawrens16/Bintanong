@@ -2,9 +2,9 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 12
+sequence: 13
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: ca86d2a8
+head_commit: c20347d0
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T17:00:00+08:00
 ---
@@ -102,9 +102,20 @@ updated_at: 2026-11-15T17:00:00+08:00
   Not done in part 1: browser run through uvicorn + `next dev`, Supabase row counts before and after (code
   only issues `select`, shown by `test_no_supabase_write_method_is_called`), other providers (no keys).
 
+- Task 8 part 2 (owner approved the base-image downloads, 15 Nov 2026), commit `4f6a5e0d`:
+  `docker/agent-api.Dockerfile` (+ its own `.dockerignore`), `render.yaml`, `.env.example` additions,
+  `docs/development/hosted-agent-deploy.md`. Base `swipl:10.0.2` (official image, same version as the source
+  build in `docker/api.Dockerfile`), `uv` 0.12.17 installs Python 3.13.15, locked `api` extra, `janus-swi`
+  1.5.3 compiled in the build stage; runtime runs as uid 10001. Build context 2.01 MB (only `backend/` and
+  `knowledge/`, without `backend/bintanong_tools/` and its ignored 19 MB dataset); image 662 MB. Run with
+  `--memory 512m`: `/health/ready` 200 after 41 s, 156.6 MiB; two chats over HTTP (class card policy answer
+  with 6 Charter citations, 4.0 s; Taglish CS 6 eligibility with stated results, "met", 4.9 s), then
+  157.6 MiB. Build log in `audit-evidence/p13-live-20261115/docker-build.log`. Render deploy not done.
+
 ## Current Task
 
-Task 8 part 2: container image and `render.yaml` (`feat/agent-deploy`), then a local browser run.
+Task 8 part 3: a local browser run (uvicorn + `next dev`), then, with the owner, the first push of the
+branch to `origin` and the Render and Vercel projects (each confirmed when it happens).
 
 ## Repository State
 
