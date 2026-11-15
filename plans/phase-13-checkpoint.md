@@ -2,9 +2,9 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 10
+sequence: 11
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: c6681ad7
+head_commit: 6d6d2a64
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T17:00:00+08:00
 ---
@@ -74,6 +74,16 @@ updated_at: 2026-11-15T17:00:00+08:00
   them; `frontend/tests/student-progress.test.mjs`. RED: module missing; GREEN: `npm run test:ui` 118 of 118
   pass with `BINTANONG_TEST_PYTHON` set to the venv Python (without it one existing test fails on a missing
   `pypdfium2` in system Python); `npx tsc --noEmit` exit 0. The waking-up timer itself is not browser-tested.
+
+- Cost changes (owner, 15 Nov 2026: "add it definitely, as long as its cost-efficient"), commit `c1454a50`:
+  DeepSeek requests send `thinking: {type: disabled}` unless `BINTANONG_LLM_THINKING=1` (deepseek-flash thinks
+  at high effort by default and its reasoning tokens bill as output); the system prompt now sends the shared
+  instructions and topic directory before the student's program and facts, so the provider's cached-prefix
+  discount applies across students; `ModelTurn.usage` / `AgentAnswer.usage` carry billed token counts (input,
+  cached input, output, reasoning; counts only). RED 8 failed, GREEN; API + agent tests 455 passed.
+  Pre-change estimate on $1.41 (character counts, not bills): about 210 questions with thinking on and no
+  cache at peak, about 800 with thinking off and cache at peak, about 1,600 off-peak. Task 8 replaces these
+  with the recorded `usage` counts and compares thinking on and off on the 12 live questions.
 
 ## Current Task
 

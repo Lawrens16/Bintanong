@@ -30,7 +30,9 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
 - Open: picker names are source file names (see checkpoint). Tasks 5-6 had no separate reviewer.
 - Task 7 done (tag `agent-m7`): frontend accepts and labels `searching` / `checking`, plus a waking-up line
   after 10 s; frontend tests 118 of 118, TypeScript check clean.
-- **Next action:** Task 8 live check; needs the owner's DeepSeek key in the ignored `.env`.
+- Cost changes (`c1454a50`, 455 passed): DeepSeek thinking off by default, shared prompt prefix first for
+  caching, token usage recorded per answer. Owner's DeepSeek balance: $1.41.
+- **Next action:** Task 8 live check (thinking on vs off, usage recorded); needs `DEEPSEEK_API_KEY` in `.env`.
 
 ## Delivered repairs
 
