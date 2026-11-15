@@ -1,0 +1,11 @@
+# Build context for docker/agent-api.Dockerfile: only backend code and knowledge manifests are copied.
+# Everything else, including ignored local institutional data, stays out of the context.
+*
+!backend/
+!knowledge/
+backend/.venv
+backend/bintanong_tools/
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/dataset/
