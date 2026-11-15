@@ -2,9 +2,9 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 11
+sequence: 12
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: 6d6d2a64
+head_commit: ca86d2a8
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T17:00:00+08:00
 ---
@@ -85,9 +85,26 @@ updated_at: 2026-11-15T17:00:00+08:00
   cache at peak, about 800 with thinking off and cache at peak, about 1,600 off-peak. Task 8 replaces these
   with the recorded `usage` counts and compares thinking on and off on the 12 live questions.
 
+- Task 8 live check, part 1 (15 Nov 2026, owner's DeepSeek key, `deepseek-flash`): 12 conversations,
+  14 model turns plus one blocked graduate question, run directly through `Agent` on the real release
+  (`audit-evidence/p13-live-20261115/live_check.py`, transcripts `transcript-off.json` / `transcript-on.json`).
+  Thinking off: 14 turns cost $0.0136 at peak prices ($0.0068 off-peak), 88% of input tokens cached,
+  1.5-7.1 s per answer, 58.3 s in total. Thinking on: $0.0232 peak (+71%), 1,959 reasoning tokens, 69.5 s.
+  Both modes: every key fact checked against its cited passage text was present (drop/DAC steps, shifting,
+  TOR PhP50.00/page, grade 1.0 = 98-100 Excellent, leave of absence one academic year, summer load 9/12 units);
+  CC 5/L loose "cc5" -> asks for CC 3/L and CC 4/L results; "passed cc3, failed cc4" -> not met (stated
+  results used); CS 6 + drop mixed question answered both parts; follow-up used history; graduate question
+  blocked by code with no model call. Differences: thinking on added a Charter step to shifting and answered
+  the WiFi question as "not in the sources, ask library staff"; thinking off called it out of scope with the
+  same referral. F04 (the 41,666.52 field) was not involved. Decision: keep thinking off by default (no
+  accuracy loss seen in 14 turns, cheaper and faster); small sample, development check only, not an accuracy
+  claim. Estimated capacity of $1.41 with thinking off: about 1,450 questions at peak, 2,900 off-peak.
+  Not done in part 1: browser run through uvicorn + `next dev`, Supabase row counts before and after (code
+  only issues `select`, shown by `test_no_supabase_write_method_is_called`), other providers (no keys).
+
 ## Current Task
 
-Task 8 (local live check, image, deploy). Blocked on the owner's DeepSeek key.
+Task 8 part 2: container image and `render.yaml` (`feat/agent-deploy`), then a local browser run.
 
 ## Repository State
 

@@ -32,7 +32,10 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
   after 10 s; frontend tests 118 of 118, TypeScript check clean.
 - Cost changes (`c1454a50`, 455 passed): DeepSeek thinking off by default, shared prompt prefix first for
   caching, token usage recorded per answer. Owner's DeepSeek balance: $1.41.
-- **Next action:** Task 8 live check (thinking on vs off, usage recorded); needs `DEEPSEEK_API_KEY` in `.env`.
+- Live check (15 Nov): 14 DeepSeek turns, all key facts present in cited passages, eligibility answers follow
+  the rule results. Thinking off: $0.0136 at peak for 14 turns (about $0.001 per question), 88% cached,
+  1.5-7 s; thinking on cost 71% more for slightly fuller wording. Thinking stays off. Not an accuracy claim.
+- **Next action:** Task 8 part 2: container image and `render.yaml`, then a local browser run.
 
 ## Delivered repairs
 
