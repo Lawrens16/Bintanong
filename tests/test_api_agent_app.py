@@ -150,3 +150,23 @@ def test_source_spans_are_read_in_pages():
     assert all(f['order'] == 'chunk_id,span_order' and f['limit'] == '1000' for _, f in requests)
     assert paged.select('chunks', filters={'a': 'eq.b'}, role='runtime') == [{'table': 'chunks'}]
     assert requests[-1] == ('chunks', {'a': 'eq.b'})
+
+
+def test_picker_uses_display_names_and_falls_back_to_the_source_file():
+    spy = SpyClient()
+    scope = spy.ledger['scope']
+    names = {'programs': {scope['program_id']: 'Bachelor of Fiction'}, 'curricula': {scope['curriculum_id']: '2018-2019'}}
+    app = agent_app().load_agent_app(environment(), client=spy, model=loop.FakeModel(), names=names)
+    client = TestClient(app, base_url='https://testserver', headers={'Origin': ORIGIN})
+    (listed,) = client.get('/curricula').json()['curricula']
+    assert (listed['programName'], listed['curriculumName']) == ('Bachelor of Fiction', '2018-2019')
+    plain = agent_app().load_agent_app(environment(), client=SpyClient(), model=loop.FakeModel(), names={})
+    (unnamed,) = TestClient(plain, base_url='https://testserver', headers={'Origin': ORIGIN}).get('/curricula').json()['curricula']
+    assert unnamed['programName'] == spy.ledger['sources'][0]['filename']
+
+
+def test_shipped_display_names_cover_programs_and_curricula():
+    names = agent_app().display_names()
+    assert set(names) >= {'programs', 'curricula'} and len(names['programs']) == 38 and len(names['curricula']) == 39
+    assert names['programs']['palsu-bscs'] == 'Bachelor of Science in Computer Science'
+    assert all(isinstance(v, str) and v.strip() for group in ('programs', 'curricula') for v in names[group].values())
