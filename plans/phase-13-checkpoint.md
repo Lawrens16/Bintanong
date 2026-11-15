@@ -2,9 +2,9 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 8
+sequence: 9
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: d1e22a90
+head_commit: bb37960a
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T17:00:00+08:00
 ---
@@ -70,7 +70,7 @@ updated_at: 2026-11-15T17:00:00+08:00
 
 ## Current Task
 
-Task 7 (frontend labels), then the open items below before Task 8.
+Task 7 (frontend labels).
 
 ## Repository State
 
@@ -172,17 +172,20 @@ Task 7 (frontend labels), then the open items below before Task 8.
 - Render free memory has one unverified conflicting report (256 MB); re-read in the dashboard at deploy.
 - Full-suite environmental baseline to compare against later: 82 failures and 9 collection errors.
 
-- Open, found in Task 6: (1) grades the student types in chat are not passed to the rule check; only
-  confirmed upload facts are, so "I passed CC 3, can I take CC 5?" evaluates as unknown. Proposed fix,
-  test-first: an optional `student_results` argument on `check_prerequisite`. (2) Program and curriculum
-  names shown in the picker are source file names (the original app reads names from its local config).
+- Typed grades (found in Task 6, fixed in `5a566bf7`): `check_prerequisite` takes an optional
+  `student_results` list (`course_id`, `state` in passed/failed/enrolled/not_taken) for results the student
+  stated in chat. They are merged with confirmed upload facts by the existing `merge_facts` for that check
+  only and are not stored as session facts. RED 4 failed, GREEN; API + agent tests 447 passed. Real BSCS
+  2018-2019 rules, read-only (`probe_stated_real.py`): CC 5/L with nothing stated -> unknown; CC 3/L passed
+  only -> unknown (CC 4/L); both passed -> met; CC 4/L failed -> not_met.
+- Open: program and curriculum names shown in the picker are source file names (the original app reads
+  names from its local config).
 - `guards.py` imports `router.py` and `agent_app.py` imports `research_app._public_key`, which pull the
   original generation stack into memory; measured 187 MB on Windows, re-check on Linux in Task 8.
 
 ## Next Action
 
-Task 7 (frontend labels) on `feat/agent-api`; then the typed-grades fix above, test-first.
-Task 8 needs the owner's DeepSeek key in the ignored `.env`.
+Task 7 (frontend labels) on `feat/agent-api`. Task 8 needs the owner's DeepSeek key in the ignored `.env`.
 
 ## Do Not Repeat
 

@@ -26,8 +26,9 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
   plus transport/adapter tests: 159 passed. Task 5 had no separate reviewer; full suite not run.
 - Task 6 done (`a46d812a`, tag `agent-m6`): `load_agent_app` serves the agent through the existing API and stream;
   API + agent tests 443 passed; read-only start on the real release took 44 s at 187 MB with 39 curricula.
-- Open: typed grades do not reach the rule check yet; picker names are file names (see checkpoint).
-- **Next action:** Task 7 frontend labels, then the typed-grades fix; Task 8 needs the owner's DeepSeek key.
+- Typed grades now reach the rule check (`5a566bf7`, 447 passed; real BSCS CC 5/L check behaves as printed).
+- Open: picker names are source file names (see checkpoint). Tasks 5-6 had no separate reviewer.
+- **Next action:** Task 7 frontend labels; Task 8 needs the owner's DeepSeek key in the ignored `.env`.
 
 ## Delivered repairs
 
