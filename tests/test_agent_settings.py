@@ -45,3 +45,8 @@ def test_from_env_openai_requires_model():
 def test_from_env_rejects_unknown_provider():
     with pytest.raises(ValueError, match='llm_provider_invalid'):
         agent().AgentSettings.from_env({'BINTANONG_LLM_PROVIDER': 'other'})
+
+
+def test_from_env_thinking_is_off_unless_chosen():
+    assert agent().AgentSettings.from_env({'DEEPSEEK_API_KEY': 'k'}).thinking is False
+    assert agent().AgentSettings.from_env({'DEEPSEEK_API_KEY': 'k', 'BINTANONG_LLM_THINKING': '1'}).thinking is True

@@ -185,3 +185,48 @@ def test_api_key_never_in_repr():
     objects = [settings, providers().build_model(settings),
                providers().build_model(settings_module().AgentSettings('anthropic', 'm', 'secret-key'))]
     assert all('secret-key' not in repr(item) for item in objects)
+
+
+def test_extra_payload_is_sent_with_every_request():
+    seen = []
+    def handler(request):
+        seen.append(json.loads(request.content))
+        return reply({'content': 'ok'})
+    complete_with(lambda c: compatible(c, extra_payload={'thinking': {'type': 'disabled'}}), handler, USER_HI)
+    assert seen[0]['thinking'] == {'type': 'disabled'} and seen[0]['model'] == 'm1'
+
+
+def test_deepseek_thinking_is_off_unless_chosen():
+    # deepseek-flash thinks at high effort by default (API docs, 15 Nov 2026); thinking tokens bill as output.
+    quiet = providers().build_model(settings_module().AgentSettings('deepseek', 'm', 'k'))
+    thinking = providers().build_model(settings_module().AgentSettings('deepseek', 'm', 'k', thinking=True))
+    assert quiet.extra_payload == {'thinking': {'type': 'disabled'}} and thinking.extra_payload == {}
+    for provider in ('openai', 'gemini'):
+        assert providers().build_model(settings_module().AgentSettings(provider, 'm', 'k')).extra_payload == {}
+
+
+def test_openai_compatible_reports_token_usage():
+    def deepseek(request):
+        return httpx.Response(200, json={'choices': [{'message': {'content': 'ok'}}], 'usage': {
+            'prompt_tokens': 1000, 'prompt_cache_hit_tokens': 800, 'prompt_cache_miss_tokens': 200,
+            'completion_tokens': 70, 'completion_tokens_details': {'reasoning_tokens': 20}}})
+    def openai(request):
+        return httpx.Response(200, json={'choices': [{'message': {'content': 'ok'}}], 'usage': {
+            'prompt_tokens': 500, 'prompt_tokens_details': {'cached_tokens': 300}, 'completion_tokens': 9}})
+    Usage = providers().Usage
+    assert complete_with(compatible, deepseek, USER_HI).usage == Usage(1000, 800, 70, 20)
+    assert complete_with(compatible, openai, USER_HI).usage == Usage(500, 300, 9, 0)
+    assert complete_with(compatible, lambda r: reply({'content': 'ok'}), USER_HI).usage == Usage()
+
+
+def test_anthropic_reports_token_usage():
+    def handler(request):
+        return httpx.Response(200, json={'content': [{'type': 'text', 'text': 'ok'}], 'usage': {
+            'input_tokens': 100, 'cache_read_input_tokens': 900, 'cache_creation_input_tokens': 50,
+            'output_tokens': 40}})
+    assert complete_with(anthropic, handler, USER_HI).usage == providers().Usage(1050, 900, 40, 0)
+
+
+def test_usage_adds_up():
+    Usage = providers().Usage
+    assert Usage(10, 5, 2, 1) + Usage(1, 1, 1, 1) == Usage(11, 6, 3, 2)
