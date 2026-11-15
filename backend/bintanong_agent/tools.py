@@ -4,51 +4,67 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 
+from pydantic import ValidationError
+
+from ..bintanong_private_context.memory import merge_facts
+from ..bintanong_routing.contracts import ScopedFact
 from .corpus import Corpus, Passage
-from .curriculum import CurriculumTools, find_courses
+from .curriculum import FALLBACK_SESSION, CurriculumTools, find_courses
 from .search import MAX_TOP_K, SearchBackend
 
 TOPIC_PASSAGE_LIMIT = 12
 TERMS = ['first_semester', 'second_semester', 'summer', 'any']
+STATED_STATES = ['passed', 'failed', 'enrolled', 'not_taken']
 
-# name -> (description, required arguments, optional arguments); an argument is name -> (JSON type, description)
-_COURSE_ID = {'course_id': ('string', 'A course_id returned by find_course.')}
+
+def _argument(kind: str, description: str, **schema) -> dict:
+    return {'type': kind, 'description': description, **schema}
+
+
+# name -> (description, required arguments, optional arguments); an argument is name -> JSON schema
+_COURSE_ID = {'course_id': _argument('string', 'A course_id returned by find_course.')}
+_STUDENT_RESULTS = _argument(
+    'array', 'Course results the student stated in this conversation, each with a course_id from find_course. '
+             'Leave out results the student did not state.',
+    items={'type': 'object', 'required': ['course_id', 'state'], 'properties': {
+        'course_id': {'type': 'string'}, 'state': {'type': 'string', 'enum': STATED_STATES}}})
 TOOL_SPECS = {
     'search_documents': (
         'Keyword search over the reviewed university documents. Returns passages with ids to cite.',
-        {'query': ('string', 'Search words. English source terms work best.')},
-        {'top_k': ('integer', f'How many passages to return, 1 to {MAX_TOP_K}.')}),
+        {'query': _argument('string', 'Search words. English source terms work best.')},
+        {'top_k': _argument('integer', f'How many passages to return, 1 to {MAX_TOP_K}.')}),
     'open_topic': (
         'Read the passages of one topic from the topic directory.',
-        {'topic_id': ('string', 'A topic id exactly as listed in the topic directory.')}, {}),
+        {'topic_id': _argument('string', 'A topic id exactly as listed in the topic directory.')}, {}),
     'find_course': (
         "Find courses in the student's curriculum from loosely typed text (a code such as cc5 or a title).",
-        {'text': ('string', 'The course as the student typed it.')}, {}),
+        {'text': _argument('string', 'The course as the student typed it.')}, {}),
     'check_prerequisite': (
         "The printed prerequisite rule of a course and its evaluation against the student's known course facts.",
-        _COURSE_ID, {}),
+        _COURSE_ID, {'student_results': _STUDENT_RESULTS}),
     'course_facts': ('Printed facts of one course: code, title, units, year and term.', _COURSE_ID, {}),
     'list_term_courses': (
         'Courses printed for one year level and term of the curriculum.',
-        {'year': ('integer', 'Year level, for example 2.'), 'term': ('string', 'One of: ' + ', '.join(TERMS) + '.')},
-        {}),
+        {'year': _argument('integer', 'Year level, for example 2.'),
+         'term': _argument('string', 'One of: ' + ', '.join(TERMS) + '.')}, {}),
     'list_affected_courses': ('Courses whose printed prerequisites depend on the given course.', _COURSE_ID, {}),
 }
 DOCUMENT_TOOLS = ('search_documents', 'open_topic')
-_PYTHON_TYPES = {'string': str, 'integer': int}
+_PYTHON_TYPES = {'string': str, 'integer': int, 'array': list}
 
 
 def _schema(name: str) -> dict:
     description, required, optional = TOOL_SPECS[name]
-    properties = {argument: {'type': kind, 'description': text}
-                  for argument, (kind, text) in {**required, **optional}.items()}
     return {'type': 'function', 'function': {'name': name, 'description': description, 'parameters': {
-        'type': 'object', 'properties': properties, 'required': list(required)}}}
+        'type': 'object', 'properties': {**required, **optional}, 'required': list(required)}}}
 
 
 def _valid(value, kind: str) -> bool:
     if type(value) is not _PYTHON_TYPES[kind]:  # bool is not an integer here
         return False
+    if kind == 'array':  # the only array argument is student_results
+        return all(isinstance(item, dict) and isinstance(item.get('course_id'), str)
+                   and item.get('state') in STATED_STATES for item in value)
     return bool(value.strip()) if kind == 'string' else True
 
 
@@ -58,7 +74,7 @@ def _checked_arguments(name: str, arguments) -> dict | None:
         return None
     known = {**required, **optional}
     chosen = {argument: value for argument, value in arguments.items() if argument in known}
-    return chosen if all(_valid(value, known[argument][0]) for argument, value in chosen.items()) else None
+    return chosen if all(_valid(value, known[argument]['type']) for argument, value in chosen.items()) else None
 
 
 @dataclass
@@ -122,9 +138,17 @@ class ToolRunner:
         return {'candidates': [{'course_id': match.course_id, 'printed_code': match.printed_code,
                                 'title': match.title} for match in matches]}
 
-    async def _check_prerequisite(self, state, course_id):
+    async def _check_prerequisite(self, state, course_id, student_results=()):
+        session_id = state.facts[0].session_id if state.facts else FALLBACK_SESSION
+        try:
+            stated = tuple(ScopedFact.parse(dict(
+                fact_id=f'fact-stated-{number}', session_id=session_id, program_id=state.program_id,
+                curriculum_id=state.curriculum_id, course_id=item['course_id'], state=item['state'],
+                source='user_statement')) for number, item in enumerate(student_results))
+        except ValidationError:
+            return {'error': 'invalid_arguments'}
         result = await self.curriculum.prerequisite_check(state.curriculum_id, state.program_id, course_id,
-                                                          state.facts)
+                                                          merge_facts(state.facts, stated))
         if 'error' not in result:
             state.rule_checks.append(result)
         return result

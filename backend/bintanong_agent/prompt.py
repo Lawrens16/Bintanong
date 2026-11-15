@@ -35,6 +35,9 @@ Course and eligibility questions
 - For "can I take X" and other prerequisite questions, call find_course with what the student typed, then \
 check_prerequisite with the chosen course_id, before you answer. If find_course returns several candidates \
 and the right one is not clear, ask the student which one they mean.
+- When the student has said in this conversation that they passed, failed or are enrolled in a course, pass \
+that to check_prerequisite as student_results (use find_course to get each course_id). Only pass what the \
+student actually said; never assume a result.
 - Word the answer yourself from the tool's printed rule and its evaluation. Use the printed course codes.
 - "unknown" is not "not met". When the evaluation is unknown, say which facts are missing (for example \
 whether a prerequisite course was passed) and ask for them. A printed rule of "None" means the course has \
