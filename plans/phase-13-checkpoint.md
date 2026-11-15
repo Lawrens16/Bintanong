@@ -2,9 +2,9 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 13
+sequence: 14
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: c20347d0
+head_commit: 6882f95f
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T17:00:00+08:00
 ---
@@ -112,10 +112,22 @@ updated_at: 2026-11-15T17:00:00+08:00
   with 6 Charter citations, 4.0 s; Taglish CS 6 eligibility with stated results, "met", 4.9 s), then
   157.6 MiB. Build log in `audit-evidence/p13-live-20261115/docker-build.log`. Render deploy not done.
 
+- Task 8 part 3, browser run (container on 8030 under `--memory 512m`, `next dev` on 3230 with
+  `API_INTERNAL_URL` / `SITE_ORIGIN` set in the process environment; `.env.local` untouched; guest mode):
+  program picker, BSCS 2018-2019, "pwede ba ko mag cc5?" (asks for CC 3/L and CC 4/L results) and the
+  follow-up "pasado ako sa cc3 pero bagsak ako sa cc4" (not yet, CC 4/L) work. Two defects found and fixed
+  test-first in `b825acae` (RED 5 failed, GREEN; API + agent tests 456 passed): (1) any answer with citations was
+  cut off as "Response interrupted", because the frontend accepts only source ids `ev-<64 hex>` and the agent
+  sent short ids (`C018`); source ids are now `ev-<chunk id>` (all 560 real chunk ids are 64-hex, every
+  passage has a page); (2) an English question after Taglish turns was answered in Taglish; the prompt now
+  says the reply language comes from the latest message only. Rechecked in the browser after rebuilding:
+  English reply, "Sources (6)", source card shows the Charter p. 110 passage. Still open: the picker shows
+  source file names ("ComSci-for-student-new-version.pdf") and searching "Computer Science" finds nothing.
+
 ## Current Task
 
-Task 8 part 3: a local browser run (uvicorn + `next dev`), then, with the owner, the first push of the
-branch to `origin` and the Render and Vercel projects (each confirmed when it happens).
+With the owner: picker display names (needs a names list), then the first push of the branch to `origin`
+and the Render and Vercel projects (each confirmed when it happens).
 
 ## Repository State
 

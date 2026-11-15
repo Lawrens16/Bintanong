@@ -37,7 +37,9 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
   1.5-7 s; thinking on cost 71% more for slightly fuller wording. Thinking stays off. Not an accuracy claim.
 - Container image + `render.yaml` done (`4f6a5e0d`): image runs under a 512 MB cap at about 158 MB, ready in 41 s,
   answers over HTTP in 4-5 s. Nothing pushed or deployed.
-- **Next action:** local browser run; then, with the owner, first push to `origin` and Render/Vercel setup.
+- Browser run done: two defects fixed (cited answers were cut off by the frontend's source-id rule; English
+  after Taglish replied in Taglish), 456 passed, rechecked in the browser. Picker still shows file names.
+- **Next action:** owner decides picker names; then first push to `origin` and Render/Vercel setup.
 
 ## Delivered repairs
 
