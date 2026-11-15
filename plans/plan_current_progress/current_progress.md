@@ -48,7 +48,9 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
 - Owner, 15 Nov: PR #1 opened on the fork (`feat/hosted-llm-agent` -> `main`; no `dev` branch); repo stays public;
   no grades or identity: uploads off, identifiers removed before the model, general privacy notice (467 backend /
   121 frontend tests pass; browser checked). Decision in `plans/owner-decisions-ledger.md`.
-- **Next action:** owner runs a manual Render deploy so the backend change is live (Vercel redeploys on push).
+- Live (15 Nov, after the owner's Render deploy): Render and Vercel `/uploads` return 404; public pages show the
+  new notice; a chat containing a student number and email answered CS 6 eligibility correctly (6.6 s).
+- **Next action:** none pending; owner reviews/merges PR #1 when ready. Optional: Render cold-start timing.
 
 ## Delivered repairs
 
