@@ -2,9 +2,9 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 9
+sequence: 10
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: bb37960a
+head_commit: c6681ad7
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T17:00:00+08:00
 ---
@@ -68,9 +68,16 @@ updated_at: 2026-11-15T17:00:00+08:00
   `BINTANONG_ALLOW_GUESTS=1`, `BINTANONG_RELEASE_ID`, `BINTANONG_RESEARCH_AUTHORIZATION`.
   **Not done:** separate task reviewer; `BINTANONG_VECTOR_SEARCH` (keyword search only; deferred, no online use).
 
+- Task 7 (frontend labels), commit `16732fd0`, merged and tagged `agent-m7`: new `frontend/lib/student-progress.ts`
+  (stages `waiting`, `understanding`, `searching`, `checking`, `writing`, their lines, and the "waking up"
+  line after 10 s with nothing received), `student-transport.ts` accepts the new stages, `workspace.tsx` uses
+  them; `frontend/tests/student-progress.test.mjs`. RED: module missing; GREEN: `npm run test:ui` 118 of 118
+  pass with `BINTANONG_TEST_PYTHON` set to the venv Python (without it one existing test fails on a missing
+  `pypdfium2` in system Python); `npx tsc --noEmit` exit 0. The waking-up timer itself is not browser-tested.
+
 ## Current Task
 
-Task 7 (frontend labels).
+Task 8 (local live check, image, deploy). Blocked on the owner's DeepSeek key.
 
 ## Repository State
 
@@ -185,7 +192,9 @@ Task 7 (frontend labels).
 
 ## Next Action
 
-Task 7 (frontend labels) on `feat/agent-api`. Task 8 needs the owner's DeepSeek key in the ignored `.env`.
+Task 8: owner adds `DEEPSEEK_API_KEY=...` to the ignored `.env`; then start `load_agent_app` with uvicorn
+and `next dev`, ask the 12 live questions and read each answer against its cited passages. The container
+image and `render.yaml` can be prepared without the key on `feat/agent-deploy`.
 
 ## Do Not Repeat
 

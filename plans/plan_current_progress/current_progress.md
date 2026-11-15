@@ -28,7 +28,9 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
   API + agent tests 443 passed; read-only start on the real release took 44 s at 187 MB with 39 curricula.
 - Typed grades now reach the rule check (`5a566bf7`, 447 passed; real BSCS CC 5/L check behaves as printed).
 - Open: picker names are source file names (see checkpoint). Tasks 5-6 had no separate reviewer.
-- **Next action:** Task 7 frontend labels; Task 8 needs the owner's DeepSeek key in the ignored `.env`.
+- Task 7 done (tag `agent-m7`): frontend accepts and labels `searching` / `checking`, plus a waking-up line
+  after 10 s; frontend tests 118 of 118, TypeScript check clean.
+- **Next action:** Task 8 live check; needs the owner's DeepSeek key in the ignored `.env`.
 
 ## Delivered repairs
 
