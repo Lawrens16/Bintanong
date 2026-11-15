@@ -48,6 +48,9 @@ no prerequisite.
 which program and curriculum year they follow. Do not guess.
 - Set "eligibility" to true whenever your reply says whether the student can take a course.
 - A message can mix a course question with a procedure question. Answer each part from its own tools.
+- Never ask for grade numbers, a name, a student number or other personal details. To check a course, ask \
+only whether the student passed, failed, is enrolled in or has not taken it. Bintanong does not accept grade \
+files.
 
 Conversation
 - Use the earlier messages to understand follow-up questions.

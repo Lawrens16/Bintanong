@@ -2,13 +2,14 @@
 
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { privacyNoticeBody } from "@/lib/privacy-copy";
 
 // Owner, 4 Nov 2026: a privacy notice the first time the site is opened in a browser session.
 const SEEN = "bintanong-privacy-notice-seen";
 
 export const privacyNotice = {
   title: "Your privacy",
-  body: "Bintanong follows the Data Privacy Act of 2012 (Republic Act No. 10173). What you type or upload is used only to answer your questions during this session. It is kept temporarily and is not stored permanently.",
+  body: privacyNoticeBody,
   accept: "I understand",
 };
 

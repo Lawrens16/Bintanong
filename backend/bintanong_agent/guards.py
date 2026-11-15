@@ -20,6 +20,17 @@ UNAVAILABLE_REPLY = {
     'english': 'Bintanong is temporarily unavailable. Please try again later.',
     'taglish': 'Temporarily unavailable ang Bintanong. Paki-try ulit later.'}
 
+# Owner, 15 Nov 2026: no grades or identity reach the hosted model; obvious identifiers are removed first.
+_PERSONAL_DETAILS = re.compile(
+    r'[\w.+-]+@[\w-]+(?:\.[\w-]+)+'                          # email address
+    r'|(?<!\w)(?:\+63|0)\s?9\d{2}[\s-]?\d{3}[\s-]?\d{4}(?!\d)'   # Philippine mobile number
+    r'|(?<![\w-])(?:\d{2}|(?:19|20)\d{2})-\d{5,6}(?![\w-])')     # student number, e.g. 2021-12345; not 2018-2019
+
+
+def redact_personal_details(text: str) -> str:
+    return _PERSONAL_DETAILS.sub('[removed]', text)
+
+
 _FILIPINO_WORDS = re.compile(
     r'\b(po|ba|ang|ng|mga|paano|pano|pwede|puwede|ako|ko|sa|na|ano|saan|kailan|yung|lang|naman|hindi)\b', re.I)
 

@@ -45,8 +45,10 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
 - Phase closed (15 Nov): full suite identical to the starting commit (233 failed / 36 errors, same ids; +157
   passing new tests); Supabase newest rows dated before the phase; handoff records the gaps (DeepSeek-only
   live check, guard 2 not exercised live, Render cold start/memory unread, privacy-notice question).
-- **Next action:** owner confirmation to open PR `feat/hosted-llm-agent` -> fork `dev`; owner decisions on the
-  privacy notice and repository visibility.
+- Owner, 15 Nov: PR #1 opened on the fork (`feat/hosted-llm-agent` -> `main`; no `dev` branch); repo stays public;
+  no grades or identity: uploads off, identifiers removed before the model, general privacy notice (467 backend /
+  121 frontend tests pass; browser checked). Decision in `plans/owner-decisions-ledger.md`.
+- **Next action:** owner runs a manual Render deploy so the backend change is live (Vercel redeploys on push).
 
 ## Delivered repairs
 

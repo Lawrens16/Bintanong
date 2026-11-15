@@ -240,3 +240,20 @@ def test_shared_instructions_come_before_anything_about_the_student():
     directory_end = chosen.index('FEES') + len('FEES')
     assert chosen.index('FEES') < chosen.index(fixtures.CURRICULUM) and chosen.index('FEES') < chosen.index('SYN 100')
     assert chosen[:directory_end] == unchosen[:directory_end]
+
+
+def test_personal_details_never_reach_the_model():
+    history = [{'role': 'user', 'content': 'I am 2021-12345, email juan@example.com'},
+               {'role': 'assistant', 'content': 'Noted.'}]
+    model = FakeModel(final_turn(kind='chat', text='Hi'))
+    ask(model, question='call me at 0917 123 4567, can I take SYN 104?', history=history)
+    sent = json.dumps(model.requests[0])
+    assert '2021-12345' not in sent and 'juan@example.com' not in sent and '0917 123 4567' not in sent
+    assert 'can I take SYN 104?' in sent
+
+
+def test_prompt_asks_for_pass_or_fail_only():
+    model = FakeModel(final_turn(kind='chat', text='Hi'))
+    ask(model, question='hi')
+    system = model.requests[0][0]['content']
+    assert 'Never ask for grade numbers' in system and 'student number' in system

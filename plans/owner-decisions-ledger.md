@@ -8,6 +8,16 @@ AGENTS.md, current progress or dated review records supersede older entries wher
 
 ## Owner decisions to preserve across CLI sessions
 
+- 15 November 2026 (fork: no grades or identity; general privacy notice). After reviewing that the hosted agent
+  sends questions to a third-party model API, the owner chose to generalize the notice ("make it generalized?
+  Like not to specify the deepseek") and to bar grades ("what if we just barred them from entering any grades?
+  Because we are like after all asking if they passsed or no ... We cannot even identify them"), approved with
+  "ye sure". So, in the fork only: grade-file uploads are switched off (backend routes and frontend controls);
+  email addresses, phone numbers and student numbers are removed before text reaches the model; the model asks
+  only passed / failed / enrolled / not taken; the privacy notice and FAQ say answers use a third-party AI
+  service and ask for no name, student number, grades or other personal details. The repository stays public
+  (owner: "im not going to privatize it"). This is the owner's data-minimization choice, not legal sign-off.
+
 - 15 November 2026 (fork purpose, PRD and topic directory). Owner: "this will be separate from the thesis, like
   it will not be used in the final defense of ours since it will not be implementing the algorithsm such as knn
   and cosign but it will be a working version that may be used in the public to contribute 'something' to the

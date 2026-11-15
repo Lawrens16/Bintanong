@@ -101,3 +101,20 @@ def test_fixed_replies_exist_in_both_languages():
     for replies in (module.SCOPE_NOTICE, module.FALLBACK_REPLY, module.UNAVAILABLE_REPLY):
         assert set(replies) == {'english', 'taglish'} and all(replies.values())
     assert 'undergraduate academic affairs' in module.SCOPE_NOTICE['english']
+
+
+@pytest.mark.parametrize('text, removed', [
+    ('email me at juan.delacruz@psu.palawan.edu.ph please', 'juan.delacruz@psu.palawan.edu.ph'),
+    ('my number is 0917 123 4567', '0917 123 4567'),
+    ('call +63 917-123-4567', '+63 917-123-4567'),
+    ('student no. 2021-12345, can I take CC 5?', '2021-12345'),
+    ('ID 21-12345 po ako', '21-12345'),
+])
+def test_personal_details_are_removed_before_the_model(text, removed):
+    cleaned = guards().redact_personal_details(text)
+    assert removed not in cleaned and '[removed]' in cleaned
+
+
+def test_redaction_keeps_years_course_codes_and_grades():
+    text = 'Curriculum 2018-2019: can I take NCM15-115A or CC 5/L? I got 1.75 in CC 3/L and 2.0 sa CS-3.'
+    assert guards().redact_personal_details(text) == text
