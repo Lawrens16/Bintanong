@@ -6,6 +6,7 @@ import { ChevronDown, ClipboardList, Ellipsis, FolderOpen, GraduationCap, Info, 
 import { clearStudentSession, confirmStudentFile, getStudentCurricula, removeStudentFile, sendStudentMessage, uploadStudentFile } from "@/lib/student-transport";
 import { StudentTransportError, type StudentAnswer, type StudentChoice, type StudentCurriculum, type StudentScope, type StudentSourceSummary } from "@/lib/student-contracts";
 import { busyRetryDelay, createWorkspace, selectedPDF, workspaceReducer } from "@/lib/student-workspace";
+import { CONNECTING, WAKING_UP, WAKING_UP_AFTER_MS, progressLabel } from "@/lib/student-progress";
 import { Button } from "@/components/ui/button";
 import { Sidebar, SidebarBrand } from "./sidebar";
 import { Conversation, EmptyConversation } from "./conversation";
@@ -24,7 +25,6 @@ import { RephraseDialog, SuppliedDetailsPanel } from "./follow-up-dialog";
 
 /** m:ss, for the question-limit wait. */
 const clockText = (ms: number) => { const seconds = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`; };
-const stages: Record<string, string> = { waiting: "Waiting for a free answer slot… You can stop waiting.", understanding: "Checking the information for your question…", writing: "Preparing the response…" };
 function errorText(error: unknown) {
   if (error instanceof StudentTransportError) {
     if (error.code === "sign_in_required" || error.code === "psu_account_required") return "Your sign-in needs attention. Sign in again to continue; your conversation is still visible here.";
@@ -42,7 +42,7 @@ export function Workspace({ signedIn = false }: { signedIn?: boolean }) {
   const [pickerKey, setPickerKey] = useState(0);
   const [scopeOpen, setScopeOpen] = useState(true), [filesOpen, setFilesOpen] = useState(false), [clearOpen, setClearOpen] = useState(false);
   const [files, setFiles] = useState<ChatFile[]>([]), [fileWarning, setFileWarning] = useState<string | null>(null);
-  const [sources, setSources] = useState<StudentSourceSummary[] | null>(null), [progress, setProgress] = useState("Connecting…");
+  const [sources, setSources] = useState<StudentSourceSummary[] | null>(null), [progress, setProgress] = useState(CONNECTING);
   const [detailsOpen, setDetailsOpen] = useState(false), [rephraseOpen, setRephraseOpen] = useState(false), [selectedDetails, setSelectedDetails] = useState<string[]>([]);
   // A question refused before it started: all answer slots busy, or this person's question limit (`limited`).
   // `retryAt` (epoch ms) is when it is sent again, null once automatic busy retries stop.
@@ -130,12 +130,14 @@ export function Workspace({ signedIn = false }: { signedIn?: boolean }) {
     if (flight.current || !text || signInNeeded || !selectedScope) return;
     const value = begin("chat");
     setClarification(null); setSelectedDetails([]); setReview(null); setRetry(null);
-    dispatch({ type: "submit", id: value.id, ...(confirmed ? { text, clearDraft: confirmed.clearDraft } : {}) }); setProgress("Connecting…");
+    dispatch({ type: "submit", id: value.id, ...(confirmed ? { text, clearDraft: confirmed.clearDraft } : {}) }); setProgress(CONNECTING);
+    // Nothing received yet after a while: the hosted server is probably starting.
+    const waking = setTimeout(() => { if (!value.controller.signal.aborted) setProgress(WAKING_UP); }, WAKING_UP_AFTER_MS);
     try {
       const answer = await sendStudentMessage({ id: value.id, text, programId: selectedScope.programId, curriculumId: selectedScope.curriculumId }, {
         signal: value.controller.signal,
-        onText: text => { if (!value.controller.signal.aborted) dispatch({ type: "delta", id: value.id, text }); },
-        onProgress: stage => { if (!value.controller.signal.aborted) setProgress(stages[stage]); },
+        onText: text => { clearTimeout(waking); if (!value.controller.signal.aborted) dispatch({ type: "delta", id: value.id, text }); },
+        onProgress: stage => { clearTimeout(waking); if (!value.controller.signal.aborted) setProgress(progressLabel(stage)); },
       });
       if (!value.controller.signal.aborted) {
         dispatch({ type: "complete", id: value.id, answer });
@@ -153,7 +155,7 @@ export function Workspace({ signedIn = false }: { signedIn?: boolean }) {
         setNow(Date.now());
       } else dispatch({ type: "interrupt", id: value.id, warning: errorText(error) });
     }
-    finally { finish(value); }
+    finally { clearTimeout(waking); finish(value); }
   }
   // The retry timer calls the latest send with the latest retry state.
   const sendRef = useRef(send), retryRef = useRef(retry); sendRef.current = send; retryRef.current = retry;

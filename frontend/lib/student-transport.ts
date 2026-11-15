@@ -3,7 +3,9 @@ import { z } from "zod";
 import { answerMetadataSchema, confirmedSchema, choiceSchema, curriculaSchema, sourceIdSchema, sourceSchema, uploadIdSchema, uploadSchema,
   StudentTransportError, type StudentAnswer, type StudentChoice, type StudentRequest, type StudentScope, type StudentSourceSummary } from "./student-contracts.ts";
 
-type Options = { signal: AbortSignal; onText: (text: string) => void; onProgress?: (code: string) => void; fetch?: typeof fetch };
+import { progressStages, type ProgressStage } from "./student-progress.ts";
+
+type Options = { signal: AbortSignal; onText: (text: string) => void; onProgress?: (stage: ProgressStage) => void; fetch?: typeof fetch };
 export async function boundedJSON(response: Response, limit = 1048576) {
   if (!response.body) throw new StudentTransportError("invalid_response");
   const reader = response.body.getReader(), chunks: Uint8Array[] = [];
@@ -98,7 +100,7 @@ export async function sendStudentMessage(request: StudentRequest, options: Optio
       switch (chunk.type) {
         case "error": throw new StudentTransportError(/^[a-z_]{1,64}$/.test(chunk.errorText) ? chunk.errorText : "answer_unavailable");
         case "data-status": {
-          const data = z.strictObject({ stage: z.enum(["waiting", "understanding", "writing"]) }).parse(chunk.data);
+          const data = z.strictObject({ stage: z.enum(progressStages) }).parse(chunk.data);
           options.onProgress?.(data.stage); break;
         }
         case "text-start":
