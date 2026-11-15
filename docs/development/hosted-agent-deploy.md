@@ -12,6 +12,10 @@ Target: backend on Render (free web service, 512 MB), frontend on Vercel (Hobby)
 - **Supabase is read-only.** The app reads with the public anon (publishable) key and refuses a service-role key at
   startup. It issues `select` reads only; it never writes, migrates or calls a writing RPC.
 - **Chats live in memory.** A restart or a Render sleep clears sessions and chat history.
+- **No grades or identity (owner, 15 Nov 2026).** Grade-file uploads are switched off; email addresses, phone
+  numbers and student numbers are removed before text reaches the model; students are asked only whether they
+  passed, failed or have not taken a course. Questions and chat history go to the configured model provider
+  (currently DeepSeek, `deepseek-flash`); the site's notice describes it generally as a third-party AI service.
 - **Model cost.** Each question is a few model calls. Measured on 15 Nov 2026 with `deepseek-flash`, thinking off:
   about $0.001 per question at peak prices, half that off-peak (14 live turns cost $0.0136). Thinking is off unless
   `BINTANONG_LLM_THINKING=1`; it cost 71% more in the same check.
