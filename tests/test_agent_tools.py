@@ -169,6 +169,46 @@ def test_check_prerequisite_uses_session_scope_and_records_the_rule_check():
     assert state.rule_checks == [RULE_RESULT]
 
 
+def test_check_prerequisite_passes_results_the_student_stated_in_chat():
+    runner, state = make_runner(), make_state()
+    call(runner, 'check_prerequisite', {'course_id': 'course-syn-104', 'student_results': [
+        {'course_id': 'course-syn-100', 'state': 'passed'}]}, state)
+    (stated,) = runner.curriculum.calls[0][4]
+    assert (stated.course_id, stated.state, stated.source) == ('course-syn-100', 'passed', 'user_statement')
+    assert (stated.program_id, stated.curriculum_id) == (PROGRAM, CURRICULUM)
+    assert state.facts == ()  # a stated result is used for this check only
+
+
+def test_stated_results_join_the_confirmed_upload_facts_of_the_same_session():
+    runner, state = make_runner(), make_state(facts=(passed_fact(),))
+    call(runner, 'check_prerequisite', {'course_id': 'course-syn-104', 'student_results': [
+        {'course_id': 'course-syn-100', 'state': 'failed'}, {'course_id': 'course-syn-104', 'state': 'enrolled'}]},
+         state)
+    facts = runner.curriculum.calls[0][4]
+    assert {f.session_id for f in facts} == {SESSION}
+    # The confirmed upload is kept beside the disagreeing statement, so the rule check reports the conflict.
+    assert sorted((f.course_id, f.state, f.source) for f in facts) == [
+        ('course-syn-100', 'failed', 'user_statement'), ('course-syn-100', 'passed', None),
+        ('course-syn-104', 'enrolled', 'user_statement')]
+
+
+def test_bad_stated_results_return_error_json():
+    runner, state = make_runner(), make_state()
+    for results in ('passed', [{'course_id': 'course-syn-100'}], [{'course_id': 'course-syn-100', 'state': 'aced'}],
+                    [{'course_id': 5, 'state': 'passed'}], ['course-syn-100'],
+                    [{'course_id': 'Not An Id', 'state': 'passed'}]):
+        arguments = {'course_id': 'course-syn-104', 'student_results': results}
+        assert call(runner, 'check_prerequisite', arguments, state) == {'error': 'invalid_arguments'}, results
+    assert runner.curriculum.calls == []
+
+
+def test_check_prerequisite_schema_offers_optional_student_results():
+    schema = next(s['function'] for s in make_runner().schemas if s['function']['name'] == 'check_prerequisite')
+    results = schema['parameters']['properties']['student_results']
+    assert results['type'] == 'array' and schema['parameters']['required'] == ['course_id']
+    assert results['items']['properties']['state']['enum'] == ['passed', 'failed', 'enrolled', 'not_taken']
+
+
 def test_failed_rule_check_is_not_recorded():
     runner, state = make_runner(FakeCurriculum({'error': 'course_not_found'})), make_state()
     assert call(runner, 'check_prerequisite', {'course_id': 'course-zzz'}, state) == {'error': 'course_not_found'}
