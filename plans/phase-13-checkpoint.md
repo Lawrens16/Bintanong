@@ -2,11 +2,11 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 7
+sequence: 8
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: 37e7c479
+head_commit: d1e22a90
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
-updated_at: 2026-11-15T15:30:00+08:00
+updated_at: 2026-11-15T17:00:00+08:00
 ---
 
 # Phase 13 checkpoint: hosted-LLM agent (fork)
@@ -55,9 +55,22 @@ updated_at: 2026-11-15T15:30:00+08:00
   `writing`; history is a list of `{role, content}` dicts. Search and curriculum exceptions other than the
   known error codes propagate out of `answer`.
 
+- Task 6 (API composition and stream), commit `a46d812a`, merged and tagged `agent-m6`:
+  `backend/bintanong_api/{agent_turns,agent_app}.py`, `tests/test_api_agent_{turns,app}.py`, and one widening
+  of `backend/bintanong_api/app.py` (`ApiServices.turns`, default `None` keeps `ChatTurns`). RED 21 failed
+  (modules missing), GREEN 21. All `tests/test_api_*.py` + `tests/test_agent_*.py` + transport/adapter tests:
+  443 passed (the basetemp parent folder must exist first, or `tmp_path` tests error). Read-only start on the
+  real release, no model call (`probe_agent_app_real.py`): startup 44.0 s, working set 187.1 MB, 39 curricula,
+  `/health/ready` 200, 560 passages, 171 topics, 2132 catalog entries.
+  `AgentTurns(ChatTurns)` keeps `prepare`/`checked_scope`; history is the session's committed exchanges
+  (at most 8); a `temporarily_unavailable` reply is shown but not committed. `load_agent_app(env)` reads
+  `SUPABASE_URL`, `SUPABASE_ANON_KEY`, provider variables, `BINTANONG_ALLOWED_ORIGINS` (comma-separated),
+  `BINTANONG_ALLOW_GUESTS=1`, `BINTANONG_RELEASE_ID`, `BINTANONG_RESEARCH_AUTHORIZATION`.
+  **Not done:** separate task reviewer; `BINTANONG_VECTOR_SEARCH` (keyword search only; deferred, no online use).
+
 ## Current Task
 
-Task 6 (API composition and stream) on `feat/agent-api`.
+Task 7 (frontend labels), then the open items below before Task 8.
 
 ## Repository State
 
@@ -159,9 +172,16 @@ Task 6 (API composition and stream) on `feat/agent-api`.
 - Render free memory has one unverified conflicting report (256 MB); re-read in the dashboard at deploy.
 - Full-suite environmental baseline to compare against later: 82 failures and 9 collection errors.
 
+- Open, found in Task 6: (1) grades the student types in chat are not passed to the rule check; only
+  confirmed upload facts are, so "I passed CC 3, can I take CC 5?" evaluates as unknown. Proposed fix,
+  test-first: an optional `student_results` argument on `check_prerequisite`. (2) Program and curriculum
+  names shown in the picker are source file names (the original app reads names from its local config).
+- `guards.py` imports `router.py` and `agent_app.py` imports `research_app._public_key`, which pull the
+  original generation stack into memory; measured 187 MB on Windows, re-check on Linux in Task 8.
+
 ## Next Action
 
-Task 6 (API composition and stream) on `feat/agent-api`, tests first; then Task 7 (frontend labels).
+Task 7 (frontend labels) on `feat/agent-api`; then the typed-grades fix above, test-first.
 Task 8 needs the owner's DeepSeek key in the ignored `.env`.
 
 ## Do Not Repeat

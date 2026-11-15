@@ -24,7 +24,10 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
 - Tasks 2-5 done and merged locally (tags `agent-m2`..`agent-m5`, nothing pushed): providers/settings,
   corpus/search, curriculum tools, and the tool-using loop with the four guards (`3434ae13`). Agent test files
   plus transport/adapter tests: 159 passed. Task 5 had no separate reviewer; full suite not run.
-- **Next action:** Task 6 API composition and stream on `feat/agent-api`, tests first.
+- Task 6 done (`a46d812a`, tag `agent-m6`): `load_agent_app` serves the agent through the existing API and stream;
+  API + agent tests 443 passed; read-only start on the real release took 44 s at 187 MB with 39 curricula.
+- Open: typed grades do not reach the rule check yet; picker names are file names (see checkpoint).
+- **Next action:** Task 7 frontend labels, then the typed-grades fix; Task 8 needs the owner's DeepSeek key.
 
 ## Delivered repairs
 
