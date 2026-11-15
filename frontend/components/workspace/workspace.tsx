@@ -13,6 +13,7 @@ import { Conversation, EmptyConversation } from "./conversation";
 import { ProgramPicker, type CurriculumState } from "./program-picker";
 import { programShortName } from "@/lib/programs";
 import { SIGN_IN_ENABLED } from "@/lib/auth-policy";
+import { UPLOADS_ENABLED } from "@/lib/privacy-copy";
 import { Composer } from "./composer";
 import { BrandMark } from "./brand-mark";
 import { AppearanceControl } from "./appearance-control";
@@ -278,7 +279,7 @@ export function Workspace({ signedIn = false }: { signedIn?: boolean }) {
       </div>}
       {state.warning && <div className="outcome-notice status-danger" role="alert"><p>{state.warning}</p>{signInNeeded && <a href="/login">Sign in again</a>}{state.messages.some(message => message.role === "user") && <Button variant="outline" size="sm" onClick={() => draft(state.messages.findLast(message => message.role === "user")?.text ?? "")}>Edit question</Button>}</div>}
       {signInNeeded && !state.warning && <p className="session-notice" role="alert">Your sign-in needs attention. <a href="/login">Sign in again</a> to continue.</p>}
-      <Composer live picker={picker} locked={!scope && <>
+      <Composer live uploads={UPLOADS_ENABLED} picker={picker} locked={!scope && <>
           <Lock size={16} aria-hidden="true" />
           <span>{curriculaStatus === "failed" ? "We couldn't load the program list, so chat is locked." : "Choose your program to unlock the chat."}</span>
           {curriculaStatus === "failed" && <Button type="button" size="sm" variant="outline" onClick={() => { setCurriculaAttempt(n => n + 1); openPicker(); }}>Try again</Button>}
@@ -288,7 +289,7 @@ export function Workspace({ signedIn = false }: { signedIn?: boolean }) {
         tools={<><Button type="button" variant="ghost" size="sm" className="program-chip" disabled={busy === "file" || busy === "clear" || busy === "signout"} aria-label={scope ? `Program: ${scope.programName}. Change program or curriculum` : "Choose your program"} title={scope ? "Change program or curriculum" : "Choose your program"} onClick={() => openPicker()}>
             <GraduationCap size={16} aria-hidden="true" />{scope ? <span className="program-chip-label">{programShortName(scope.programId, scope.programName)}</span> : <span>Choose program</span>}<ChevronDown size={14} aria-hidden="true" />
           </Button>
-          <Button type="button" variant="ghost" size="sm" disabled={!!busy || !scope} aria-label="Files in this chat" onClick={() => setFilesOpen(true)}><FolderOpen size={16} aria-hidden="true" />Files{files.length ? ` (${files.length})` : ""}</Button>
+          {UPLOADS_ENABLED && <Button type="button" variant="ghost" size="sm" disabled={!!busy || !scope} aria-label="Files in this chat" onClick={() => setFilesOpen(true)}><FolderOpen size={16} aria-hidden="true" />Files{files.length ? ` (${files.length})` : ""}</Button>}
           {details.length > 0 && <Button type="button" variant="ghost" size="sm" disabled={!!busy || signInNeeded} onClick={() => setDetailsOpen(true)}>Include earlier details{selectedDetails.length ? ` (${selectedDetails.length})` : ""}</Button>}</>}
       />
       </div>

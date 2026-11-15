@@ -17,6 +17,8 @@ type ComposerProps = {
   onRemove: (id: string) => void;
   picker: RefObject<HTMLInputElement | null>;
   live?: boolean;
+  /** False hides the file picker and its button (hosted agent: no grade files, owner 15 Nov 2026). */
+  uploads?: boolean;
   onStop?: () => void;
   tools?: ReactNode;
   starters?: ReactNode;
@@ -25,7 +27,7 @@ type ComposerProps = {
   locked?: ReactNode;
 };
 
-export function Composer({ draft, attachments, warning, pending, onDraft, onSend, onSelect, onRemove, picker, live = false, onStop, tools, starters, contextNote, locked }: ComposerProps) {
+export function Composer({ draft, attachments, warning, pending, onDraft, onSend, onSelect, onRemove, picker, live = false, uploads = true, onStop, tools, starters, contextNote, locked }: ComposerProps) {
   const input = useRef<HTMLTextAreaElement>(null);
   const hintId = useId(), isLocked = !!locked; // the locked placeholder is taller, so re-measure on unlock
   useLayoutEffect(() => {
@@ -42,8 +44,8 @@ export function Composer({ draft, attachments, warning, pending, onDraft, onSend
     </Alert>}
     {starters}
     <form className={`composer${locked ? " composer-locked" : ""}`} aria-disabled={locked ? true : undefined} onSubmit={event => { event.preventDefault(); if (!locked) onSend(); }}>
-      <input ref={picker} type="file" multiple={!live} accept={live ? ".pdf,application/pdf" : ".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"} className="sr-only" tabIndex={-1} aria-label={live ? "Choose a PDF for this chat" : "Choose local preview files"} onChange={event => { onSelect(Array.from(event.currentTarget.files ?? [])); event.currentTarget.value = ""; }} />
-      <Button variant="secondary" type="button" className="composer-upload" disabled={(live && pending) || !!locked} aria-label={live ? "Add a PDF to this chat" : "Select files for local preview"} title={live ? "Add a PDF to this chat" : "Select files for local preview"} onClick={() => picker.current?.click()}><Plus aria-hidden="true" size={20} /></Button>
+      {uploads && <><input ref={picker} type="file" multiple={!live} accept={live ? ".pdf,application/pdf" : ".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"} className="sr-only" tabIndex={-1} aria-label={live ? "Choose a PDF for this chat" : "Choose local preview files"} onChange={event => { onSelect(Array.from(event.currentTarget.files ?? [])); event.currentTarget.value = ""; }} />
+      <Button variant="secondary" type="button" className="composer-upload" disabled={(live && pending) || !!locked} aria-label={live ? "Add a PDF to this chat" : "Select files for local preview"} title={live ? "Add a PDF to this chat" : "Select files for local preview"} onClick={() => picker.current?.click()}><Plus aria-hidden="true" size={20} /></Button></>}
       <div className="composer-input">
         {attachments.length > 0 && <div className="attachment-tray">
           <p role="status">Added {attachments.length} {attachments.length === 1 ? "file" : "files"} <span>· Local preview only</span></p>

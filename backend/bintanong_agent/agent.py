@@ -63,7 +63,8 @@ class Agent:
         state.fetched, state.rule_checks = {}, []  # citations and rule checks count for this turn only
         scope = Scope(self.tools.corpus.directory(), state.program_id, state.curriculum_id,
                       self.tools.fact_lines(state))
-        messages = build_messages(history, question, scope)
+        history = [{**message, 'content': guards.redact_personal_details(message['content'])} for message in history]
+        messages = build_messages(history, guards.redact_personal_details(question), scope)
         stages = []
 
         def report(stage):

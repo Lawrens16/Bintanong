@@ -18,7 +18,6 @@ from backend.bintanong_agent.settings import AgentSettings
 from backend.bintanong_agent.tools import ToolRunner
 from backend.bintanong_orchestration.adapters import MultiCurriculumSymbolicAdapter, SymbolicAdapter
 from backend.bintanong_private_context.sessions import SessionStore
-from backend.bintanong_private_context.worker import extract_isolated
 from backend.bintanong_runtime.hosted_curricula import load_release_curricula
 from backend.bintanong_runtime.research import OPERATIONS, course_labels, research_catalog
 from backend.bintanong_storage.client import SupabaseStorageClient
@@ -126,9 +125,7 @@ def load_agent_app(env=None, *, client=None, model=None, names=None):
 
         services = ApiServices(
             sessions=sessions, curricula=curricula, turns=AgentTurns(sessions, agent, curricula, labels),
-            course_labels=labels, auth=auth, close=close, ready=ready,
-            extract_rows=lambda raw, program, curriculum_id: extract_isolated(
-                raw, curriculum.catalog, program_id=program, curriculum_id=curriculum_id))
+            course_labels=labels, auth=auth, close=close, ready=ready, uploads=False)
         return create_app(services, ApiSettings(
             allowed_origins=origins, require_auth=True, allow_guests=env.get('BINTANONG_ALLOW_GUESTS') == '1',
             max_running_answers=MAX_RUNNING_ANSWERS))

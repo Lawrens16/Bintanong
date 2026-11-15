@@ -50,6 +50,7 @@ class ApiServices:
     supabase_probe: object = None  # hosted storage readiness (co-worker composition)
     evaluation: object = None  # gated benchmark runs; only a trusted launcher sets this
     turns: object = None  # a ChatTurns replacement (the hosted agent); None keeps the pipeline turns
+    uploads: bool = True  # False leaves out the grade-upload routes (hosted agent, owner 15 Nov 2026)
 
 
 def create_app(services: ApiServices, settings: ApiSettings) -> FastAPI:
@@ -69,7 +70,8 @@ def create_app(services: ApiServices, settings: ApiSettings) -> FastAPI:
                                                       waiting=settings.max_waiting_answers)
     app.state.question_limit = question_limit = QuestionRateLimit(limit=settings.max_questions_per_window,
                                                                   window_seconds=settings.question_window_seconds)
-    app.include_router(upload_router(services, turns, settings.max_upload_bytes, settings.max_parallel_uploads))
+    if services.uploads:
+        app.include_router(upload_router(services, turns, settings.max_upload_bytes, settings.max_parallel_uploads))
     if services.evaluation is not None:
         app.include_router(services.evaluation.router(admission))
     app.add_api_route('/health/live', health_live, methods=['GET'])

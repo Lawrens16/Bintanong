@@ -170,3 +170,9 @@ def test_shipped_display_names_cover_programs_and_curricula():
     assert set(names) >= {'programs', 'curricula'} and len(names['programs']) == 38 and len(names['curricula']) == 39
     assert names['programs']['palsu-bscs'] == 'Bachelor of Science in Computer Science'
     assert all(isinstance(v, str) and v.strip() for group in ('programs', 'curricula') for v in names[group].values())
+
+
+def test_grade_uploads_are_switched_off():
+    _, client = started()
+    assert client.post('/uploads?programId=p&curriculumId=c', content=b'%PDF-1.4').status_code == 404
+    assert client.post('/uploads/u1/confirm', json={'decisions': []}).status_code == 404
