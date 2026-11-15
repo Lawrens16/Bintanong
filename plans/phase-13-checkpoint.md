@@ -2,11 +2,11 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 6
+sequence: 7
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: eba1d049
+head_commit: 37e7c479
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
-updated_at: 2026-11-15T14:00:00+08:00
+updated_at: 2026-11-15T15:30:00+08:00
 ---
 
 # Phase 13 checkpoint: hosted-LLM agent (fork)
@@ -39,16 +39,33 @@ updated_at: 2026-11-15T14:00:00+08:00
   the merged head: the five agent test files pass. Real curricula (`probe_curriculum_real.py`): "cc5",
   "CC-5", "cc 5/l" all resolve to CC 5/L; a rule check takes about 0.3 s; results name printed codes.
 
+- Task 5 (tools, prompt, guards, agent loop), commit `3434ae13`, merged and tagged `agent-m5`:
+  `backend/bintanong_agent/{tools,prompt,guards,agent}.py`, `tests/test_agent_{tools,guards,loop}.py`.
+  Done inline by the controller after the 14 Nov implementer was cut off by the usage limit before writing
+  anything. RED 59 failed (four modules missing), GREEN 59; neighbour passages added test-first (RED 1 failed,
+  GREEN 61). All eight agent test files + `test_routing_transport.py` + `test_orchestration_adapters.py`:
+  159 passed. Read-only run on the real release (`probe_task5_real.py`): 0 of 560 passages trip the
+  private-id scan; system prompt with the topic directory is 15,327 characters; a search result with required
+  neighbours is 6-16 thousand characters (13-28 passages); 4 topics exceed the 12-passage cap.
+  **Not done:** the separate task reviewer (no subagent was dispatched in this session) and the full suite.
+  Built interface for Task 6: `Agent(model, ToolRunner(search, corpus, curriculum), max_rounds=6)`,
+  `await agent.answer(question, history, TurnState(program_id, curriculum_id, facts), progress)` ->
+  `AgentAnswer(status, text, language, citations: tuple[Passage], used_rules)`; `answer` clears
+  `state.fetched` / `state.rule_checks` at the start of each turn; progress stages `searching`, `checking`,
+  `writing`; history is a list of `{role, content}` dicts. Search and curriculum exceptions other than the
+  known error codes propagate out of `answer`.
+
 ## Current Task
 
-Task 5 (tools, prompt, guards, agent loop). The owner approved the PRD and chose topic-directory
-option A on 15 Nov 2026.
+Task 6 (API composition and stream) on `feat/agent-api`.
 
 ## Repository State
 
-- Worktree `C:/Users/joel/orca/workspaces/Bintanong-personal/dev`, branch `feat/hosted-llm-agent`, not pushed.
+- Worktree `C:/Users/joel/orca/workspaces/Bintanong-personal/dev`, integration branch `feat/hosted-llm-agent`
+  (milestone branches merged locally, tags `agent-m2`..`agent-m5`), nothing pushed.
   `origin` = `Lawrens16/Bintanong`; `upstream` = `bintanong420/Bintanong` is never pushed to.
-- No file under `backend/`, `frontend/` or `tests/` changed so far.
+- Only new files so far: `backend/bintanong_agent/` and `tests/test_agent_*.py`. No existing file under
+  `backend/`, `frontend/` or `tests/` was edited.
 
 ## Verification Evidence
 
@@ -128,6 +145,12 @@ option A on 15 Nov 2026.
 - Topic directory: option A (derive from chunk rows: group id + printed service title where present) is
   recommended over option B (derived file from the local catalogue as a Render secret file), since B's
   labels are no better and A needs no extra file. **Owner chose A ("yeah do Option A"), 15 Nov 2026.**
+- Guard 2 (ruling R6): `private_leak` checks the cited source cards (fetched this turn, no `sess-`/`fact-`
+  ids via `foreign_ids`), not the reply text; the model is sent the student's course facts by printed code
+  only, never session or fact ids. Guard 4 uses `EXCLUDED_PROGRAM_CUES` as is; staff-only questions rely on
+  the system prompt (`out_of_scope` kind), since that list has no staff phrases.
+- Session resume, 15 Nov 2026 (new CLI session): thesis pp. 17-18 and the routing PNG re-read; no new
+  discrepancy beyond the three recorded above.
 - Owner, 15 Nov 2026: PRD approved. The fork is separate from the thesis and not used in the final defense;
   it may later be offered publicly. Verbatim in the ledger.
 
@@ -138,7 +161,8 @@ option A on 15 Nov 2026.
 
 ## Next Action
 
-Task 5 (tools, prompt, guards, agent loop) on `feat/agent-loop-guards`, tests first; then Task 6.
+Task 6 (API composition and stream) on `feat/agent-api`, tests first; then Task 7 (frontend labels).
+Task 8 needs the owner's DeepSeek key in the ignored `.env`.
 
 ## Do Not Repeat
 

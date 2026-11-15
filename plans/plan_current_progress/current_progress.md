@@ -1,6 +1,6 @@
 # Current progress
 
-Updated 15 November 2026. Active: Phase 13 hosted-LLM agent (personal fork), branch `feat/hosted-llm-agent`.
+Updated 15 November 2026. Active: Phase 13 hosted-LLM agent (personal fork), integration branch `feat/hosted-llm-agent`.
 Last full snapshot before condensation: `d2ad9fef`; before the Phase 13 entries: `f1fe3f2b` (recover with `git show`).
 Gathering checkout and owner USG notes remain separate. Phase 12 research/software write-up is complete with
 disclosures; the original build's Phase 13 deployment stays cancelled.
@@ -21,7 +21,10 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
   and model ids recorded.
 - Owner, 15 Nov: PRD approved; topic directory option A (from chunk rows); the fork is separate from the
   thesis and not used in the final defense. No Supabase change; push only to `origin`.
-- **Next action:** Task 2 providers and settings, tests first; Tasks 3 and 4 beside it.
+- Tasks 2-5 done and merged locally (tags `agent-m2`..`agent-m5`, nothing pushed): providers/settings,
+  corpus/search, curriculum tools, and the tool-using loop with the four guards (`3434ae13`). Agent test files
+  plus transport/adapter tests: 159 passed. Task 5 had no separate reviewer; full suite not run.
+- **Next action:** Task 6 API composition and stream on `feat/agent-api`, tests first.
 
 ## Delivered repairs
 
