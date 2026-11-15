@@ -205,6 +205,13 @@ def test_history_is_sent_before_the_question():
     assert sent[1:] == history + [{'role': 'user', 'content': 'thanks!'}]
 
 
+def test_reply_language_follows_the_latest_message_not_the_history():
+    # Live browser check, 15 Nov 2026: an English question after Taglish turns was answered in Taglish.
+    model = FakeModel(final_turn(kind='chat', text='Hi'))
+    ask(model, question='hi')
+    assert 'latest student message only' in model.requests[0][0]['content']
+
+
 def test_system_prompt_says_when_no_curriculum_is_chosen():
     model = FakeModel(final_turn(kind='clarify', text='Which program?'))
     ask(model, question='Can I take SYN 104?', state=fixtures.make_state(chosen=False))
