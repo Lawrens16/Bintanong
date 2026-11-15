@@ -2,9 +2,9 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 14
+sequence: 15
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: 6882f95f
+head_commit: e3bf0a9d
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T17:00:00+08:00
 ---
@@ -121,13 +121,16 @@ updated_at: 2026-11-15T17:00:00+08:00
   sent short ids (`C018`); source ids are now `ev-<chunk id>` (all 560 real chunk ids are 64-hex, every
   passage has a page); (2) an English question after Taglish turns was answered in Taglish; the prompt now
   says the reply language comes from the latest message only. Rechecked in the browser after rebuilding:
-  English reply, "Sources (6)", source card shows the Charter p. 110 passage. Still open: the picker shows
-  source file names ("ComSci-for-student-new-version.pdf") and searching "Computer Science" finds nothing.
+  English reply, "Sources (6)", source card shows the Charter p. 110 passage. Picker names (owner approved, 15 Nov 2026), commit `d667091a`:
+  `knowledge/manifests/program-display-names.json` holds the first display name of each program (38) and
+  curriculum (39) from the original research build config (test entry `curriculum-zx-2026` left out); the
+  agent app uses it and falls back to the source file name. RED 2 failed, GREEN; 458 passed. Real release:
+  39 of 39 curricula named; browser search "Computer Science" finds "Bachelor of Science in Computer Science".
 
 ## Current Task
 
-With the owner: picker display names (needs a names list), then the first push of the branch to `origin`
-and the Render and Vercel projects (each confirmed when it happens).
+First push of `feat/hosted-llm-agent` to `origin` (owner approved 15 Nov 2026); then, with the owner, the
+Render and Vercel projects (each confirmed when it happens).
 
 ## Repository State
 
