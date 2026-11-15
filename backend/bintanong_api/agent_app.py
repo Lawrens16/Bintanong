@@ -5,7 +5,9 @@ No GPU, local model, encoder or sealed package. The release it reads is the one 
 from __future__ import annotations
 
 import asyncio
+import json
 import os
+from pathlib import Path
 
 from backend.bintanong_agent.agent import Agent
 from backend.bintanong_agent.corpus import Corpus
@@ -34,6 +36,12 @@ from .research_app import _public_key
 PAGE_ROWS = 1000  # the hosted API returns at most this many rows per request
 PAGED_TABLES = {'source_spans': 'chunk_id,span_order'}  # table -> a stable order to page by
 MAX_RUNNING_ANSWERS = 4  # hosted model calls are awaited, so a few answers can run at once
+DISPLAY_NAMES = Path(__file__).resolve().parents[2] / 'knowledge' / 'manifests' / 'program-display-names.json'
+
+
+def display_names() -> dict:
+    """Program and curriculum titles for the picker; public titles, not institutional source content."""
+    return json.loads(DISPLAY_NAMES.read_text(encoding='utf-8'))
 
 
 class PagedReads:
@@ -77,9 +85,11 @@ def _required(env, names, code):
     return values
 
 
-def load_agent_app(env=None, *, client=None, model=None):
-    """Uvicorn factory. `client` and `model` are for tests; a deployment passes neither."""
+def load_agent_app(env=None, *, client=None, model=None, names=None):
+    """Uvicorn factory. `client`, `model` and `names` are for tests; a deployment passes none of them."""
     env = os.environ if env is None else env
+    names = display_names() if names is None else names
+    program_names, curriculum_names = names.get('programs', {}), names.get('curricula', {})
     url, key = _required(env, ('SUPABASE_URL', 'SUPABASE_ANON_KEY'), 'agent_credentials_required')
     key = _public_key(key)  # a service-role key is refused before anything is read
     origins = tuple(origin.strip() for origin in env.get('BINTANONG_ALLOWED_ORIGINS', '').split(',') if origin.strip())
@@ -99,9 +109,11 @@ def load_agent_app(env=None, *, client=None, model=None):
         corpus = Corpus.from_snapshot(snapshot)
         curriculum, labels = _curriculum_tools(ledgers, authorization_ref)
         agent = Agent(model, ToolRunner(KeywordSearch(corpus), corpus, curriculum))
-        curricula = tuple(CurriculumOption(ledger['scope']['program_id'], curriculum_id,
-                                           ledger['sources'][0]['filename'], ledger['sources'][0]['filename'])
-                          for curriculum_id, ledger in sorted(ledgers.items()))
+        curricula = tuple(CurriculumOption(
+            ledger['scope']['program_id'], curriculum_id,
+            program_names.get(ledger['scope']['program_id'], ledger['sources'][0]['filename']),
+            curriculum_names.get(curriculum_id, ledger['sources'][0]['filename']))
+            for curriculum_id, ledger in sorted(ledgers.items()))
         sessions = SessionStore()
 
         async def close():
