@@ -2,14 +2,14 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 
 from ..bintanong_routing.transport import RuntimeFailure
 from . import guards
 from .corpus import Passage
 from .prompt import Scope, build_messages, repair_message
-from .providers import ChatModel, ModelTurn
+from .providers import ChatModel, ModelTurn, Usage
 from .tools import DOCUMENT_TOOLS, ToolRunner, TurnState
 
 STATUS_OF_KIND = {'answer': 'answered', 'chat': 'answered', 'clarify': 'clarification_needed',
@@ -26,6 +26,7 @@ class AgentAnswer:
     language: Literal['english', 'taglish']
     citations: tuple[Passage, ...] = ()
     used_rules: bool = False
+    usage: Usage = field(default_factory=Usage)  # every model call of this answer
 
 
 def parse_final(text: str) -> dict | None:
@@ -71,6 +72,7 @@ class Agent:
                 progress(stage)
 
         repaired = retried = False
+        usage = Usage()
         for _ in range(self.max_rounds):
             try:
                 turn = await self.model.complete(messages, self.tools.schemas)
@@ -78,7 +80,9 @@ class Agent:
                 if str(failure) == REPAIRABLE_FAILURE and not retried:
                     retried = True
                     continue
-                return AgentAnswer('temporarily_unavailable', guards.UNAVAILABLE_REPLY[language], language)
+                return AgentAnswer('temporarily_unavailable', guards.UNAVAILABLE_REPLY[language], language,
+                                   usage=usage)
+            usage += turn.usage
             if turn.tool_calls:
                 messages.append(_assistant_message(turn))
                 for call in turn.tool_calls:
@@ -93,14 +97,14 @@ class Agent:
                     STATUS_OF_KIND[final['kind']], final['text'],
                     final['language'] if final.get('language') in LANGUAGES else language,
                     tuple(state.fetched[short_id] for short_id in dict.fromkeys(final['citations'])),
-                    bool(state.rule_checks))
+                    bool(state.rule_checks), usage)
             if repaired:
                 break
             repaired = True
             messages += [{'role': 'assistant', 'content': turn.text},
                          {'role': 'user', 'content': repair_message(errors)}]
             report('writing')
-        return AgentAnswer('insufficient_evidence', guards.FALLBACK_REPLY[language], language)
+        return AgentAnswer('insufficient_evidence', guards.FALLBACK_REPLY[language], language, usage=usage)
 
     @staticmethod
     def _checked(text: str, state: TurnState) -> tuple[dict | None, list[str]]:

@@ -89,8 +89,9 @@ def _session_section(scope: Scope) -> str:
 
 
 def build_messages(history: list[dict], question: str, scope: Scope) -> list[dict]:
-    system = (f'{SYSTEM_PROMPT}\n{_session_section(scope)}\n\n'
-              f'Topic directory (topic id: title (passage ids)):\n{scope.directory}')
+    # Shared text first, the student's own details last: the provider discounts a repeated prefix.
+    system = (f'{SYSTEM_PROMPT}\nTopic directory (topic id: title (passage ids)):\n{scope.directory}\n\n'
+              f'{_session_section(scope)}')
     return [{'role': 'system', 'content': system}, *history, {'role': 'user', 'content': question}]
 
 

@@ -19,6 +19,7 @@ class AgentSettings:
     provider: Provider
     model: str
     api_key: str = field(repr=False)
+    thinking: bool = False  # provider-side reasoning; off unless chosen, since its tokens bill as output
 
     @classmethod
     def from_env(cls, env=os.environ) -> 'AgentSettings':
@@ -31,4 +32,4 @@ class AgentSettings:
         model = env.get('BINTANONG_LLM_MODEL', '').strip() or DEFAULT_MODELS[provider]
         if not model:
             raise ValueError('llm_model_required')
-        return cls(provider, model, api_key)
+        return cls(provider, model, api_key, env.get('BINTANONG_LLM_THINKING', '').strip() == '1')

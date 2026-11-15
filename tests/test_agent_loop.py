@@ -209,3 +209,27 @@ def test_system_prompt_says_when_no_curriculum_is_chosen():
     model = FakeModel(final_turn(kind='clarify', text='Which program?'))
     ask(model, question='Can I take SYN 104?', state=fixtures.make_state(chosen=False))
     assert 'not chosen' in model.requests[0][0]['content']
+
+
+def test_answer_reports_the_tokens_of_every_model_call():
+    from backend.bintanong_agent.providers import Usage
+    search = ModelTurn('', SEARCH.tool_calls, Usage(4000, 3500, 30, 0))
+    final = ModelTurn(final_turn(citations=['C002']).text, (), Usage(6000, 4000, 200, 0))
+    answer, _ = ask(FakeModel(search, final))
+    assert answer.usage == Usage(10000, 7500, 230, 0)
+    fallback, _ = ask(FakeModel(ModelTurn(final_turn().text, (), Usage(10, 0, 1, 0)),
+                                ModelTurn(final_turn().text, (), Usage(10, 0, 1, 0))))
+    assert fallback.status == 'insufficient_evidence' and fallback.usage == Usage(20, 0, 2, 0)
+    blocked, _ = ask(FakeModel(), question='How do I enroll in the College of Law?')
+    assert blocked.usage == Usage()
+
+
+def test_shared_instructions_come_before_anything_about_the_student():
+    # The model provider discounts a repeated prefix, so text every student shares is sent first.
+    model = FakeModel(final_turn(kind='chat', text='Hi'), final_turn(kind='chat', text='Hi'))
+    ask(model, question='hi', state=fixtures.make_state(facts=(fixtures.passed_fact(),)))
+    ask(model, question='hi', state=fixtures.make_state(chosen=False))
+    chosen, unchosen = (request[0]['content'] for request in model.requests)
+    directory_end = chosen.index('FEES') + len('FEES')
+    assert chosen.index('FEES') < chosen.index(fixtures.CURRICULUM) and chosen.index('FEES') < chosen.index('SYN 100')
+    assert chosen[:directory_end] == unchosen[:directory_end]
