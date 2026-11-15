@@ -1,6 +1,6 @@
 # Current progress
 
-Updated 15 November 2026. Active: Phase 13 hosted-LLM agent (personal fork), integration branch `feat/hosted-llm-agent`.
+Updated 15 November 2026. Phase 13 hosted-LLM agent (personal fork) closed with a [final handoff](../phase-13-handoff.md); branch `feat/hosted-llm-agent`.
 Last full snapshot before condensation: `d2ad9fef`; before the Phase 13 entries: `f1fe3f2b` (recover with `git show`).
 Gathering checkout and owner USG notes remain separate. Phase 12 research/software write-up is complete with
 disclosures; the original build's Phase 13 deployment stays cancelled.
@@ -42,7 +42,11 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
 - Deployed (15 Nov): https://bintanong.vercel.app (Vercel, branch `feat/hosted-llm-agent`) with the backend
   on Render free (https://bintanong-agent-api.onrender.com). Policy and prerequisite chats work through the
   public site (5.7 s / 7.0 s warm). Development checks only; not institutional approval or a thesis result.
-- **Next action:** Task 9 phase close: exit-gate checks, whole-branch review, handoff, PR to the fork's `dev`.
+- Phase closed (15 Nov): full suite identical to the starting commit (233 failed / 36 errors, same ids; +157
+  passing new tests); Supabase newest rows dated before the phase; handoff records the gaps (DeepSeek-only
+  live check, guard 2 not exercised live, Render cold start/memory unread, privacy-notice question).
+- **Next action:** owner confirmation to open PR `feat/hosted-llm-agent` -> fork `dev`; owner decisions on the
+  privacy notice and repository visibility.
 
 ## Delivered repairs
 

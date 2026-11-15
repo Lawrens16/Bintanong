@@ -1,10 +1,10 @@
 ---
 artifact: phase-checkpoint
 phase: 13
-status: in_progress
-sequence: 16
+status: superseded
+sequence: 17
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: 30cc5cc9
+head_commit: b37c4902
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T17:00:00+08:00
 ---
@@ -141,7 +141,7 @@ updated_at: 2026-11-15T17:00:00+08:00
 
 ## Current Task
 
-Task 9: close the phase (exit-gate checks, whole-branch review, handoff, PR to the fork's `dev`).
+None: superseded by the [final handoff](phase-13-handoff.md).
 
 ## Repository State
 

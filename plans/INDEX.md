@@ -2,11 +2,12 @@
 
 ## Current state
 
-- Active: Phase 13 hosted-LLM agent (personal fork, owner decisions 15 Nov 2026).
-  [Plan](phase-13-hosted-llm-agent-plan.md), [checkpoint](phase-13-checkpoint.md),
+- No active phase. Latest final handoff: [Phase 13 hosted-LLM agent (fork)](phase-13-handoff.md), complete
+  with disclosures; deployed at https://bintanong.vercel.app (backend on Render free). Next permitted phase: 14.
+  [Plan](phase-13-hosted-llm-agent-plan.md), [superseded checkpoint](phase-13-checkpoint.md),
   [PRD](2026-11-15-hosted-llm-fork-prd.md), [hosting research](2026-11-15-phase-13-pre-phase-research.md).
   Worktree: Orca workspace `Bintanong-personal/dev`, branch `feat/hosted-llm-agent` (push to `origin` only).
-  The original Gemma path and Supabase stay unchanged; next permitted phase after its handoff: 14.
+  Separate from the thesis; the original Gemma path and Supabase stay unchanged.
 - Phase 12 research/software evaluation write-up complete with disclosures.
   [Plan](phase-12-evaluation-writeup-plan.md), [superseded checkpoint](phase-12-checkpoint.md),
   [latest final handoff](phase-12-handoff.md), [report](../docs/evaluation/phase12-evaluation-report.md).
@@ -26,7 +27,7 @@
 ## Resume order
 
 1. Run `python .agents/skills/bintanong-phase-handoff/scripts/phase_state.py inspect --repo .`.
-2. Read current progress, the Phase 13 checkpoint and plan, Phase12 handoff and relevant master sections;
+2. Read current progress, the Phase 13 handoff and plan, Phase 12 handoff and relevant master sections;
    compare with fresh Git evidence.
 3. For recovery, use activation results and [Claude's executor handoff](2026-10-30-hosted-560-codex-handoff.md).
    Do not rerun staging/activation or regenerate bound review artifacts.
@@ -52,7 +53,7 @@ real-source exits; ledger validity alone does not prove source readiness.
 | 10 | Private files and session context | complete offline research/software; photos unsupported; HTTP wiring in Phase 11; institutional release held | [Plan](phase-10-private-files-session-plan.md) | [Superseded](phase-10-checkpoint.md) | [Complete](phase-10-handoff.md) |
 | 11 | Backend API, frontend integration, answer accuracy | complete with disclosures (photos unsupported, 24.2 rerun not done, hosted 560 activation deferred) | [Plan](phase-11-backend-api-plan.md) | [Superseded](phase-11-checkpoint.md) | [Complete](phase-11-handoff.md) |
 | 12 | Evaluation write-up | complete with disclosed research gaps | [Plan](phase-12-evaluation-writeup-plan.md) | [Superseded](phase-12-checkpoint.md) | [Complete](phase-12-handoff.md) |
-| 13 | Hosted-LLM agent (fork) | in progress | [Plan](phase-13-hosted-llm-agent-plan.md) | [Active](phase-13-checkpoint.md) | none |
+| 13 | Hosted-LLM agent (fork) | complete with disclosures; deployed; not a thesis result | [Plan](phase-13-hosted-llm-agent-plan.md) | [Superseded](phase-13-checkpoint.md) | [Complete](phase-13-handoff.md) |
 
 ## Read only when relevant
 
