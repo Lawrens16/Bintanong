@@ -393,6 +393,13 @@ environment; do not reinstall it. Commands run from the repository root in Power
 
 ## Environment and local execution
 
+**Hosted-LLM agent (personal fork, Phase 13).** A second run path answers with one tool-using chat agent on a
+hosted model API (DeepSeek by default) over the same read-only Supabase release: no GPU, Gemma, encoder or
+sealed package. Start it with `uvicorn --factory backend.bintanong_api.agent_app:load_agent_app`; the container
+image, Render/Vercel setup and environment variables are in
+[hosted agent deploy](docs/development/hosted-agent-deploy.md). It is separate from the thesis build below and
+its results are not thesis results.
+
 Python is pinned to3.13 by `backend/pyproject.toml`; Node/npm pins are in the root
 and frontend `package.json` files. Python dependency groups and `backend/uv.lock`,
 plus the JavaScript lockfiles, define the recorded environments. Existing
