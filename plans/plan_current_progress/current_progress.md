@@ -39,11 +39,10 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
   answers over HTTP in 4-5 s. Nothing pushed or deployed.
 - Browser run done: two defects fixed (cited answers were cut off by the frontend's source-id rule; English
   after Taglish replied in Taglish), 456 passed, rechecked in the browser. Picker now shows program names (`d667091a`).
-- Deploy in progress (owner, 15 Nov): Render Blueprint created from branch `feat/hosted-llm-agent`; Vercel
-  project created (root `frontend`); a new project must deploy `main` first, so this push gives Vercel a
-  build of the agent branch to switch its production branch to.
-- **Next action:** Vercel production branch -> `feat/hosted-llm-agent`, `SITE_ORIGIN`, then Render
-  `BINTANONG_ALLOWED_ORIGINS`; check `/health/ready` and one chat through the Vercel URL.
+- Deployed (15 Nov): https://bintanong.vercel.app (Vercel, branch `feat/hosted-llm-agent`) with the backend
+  on Render free (https://bintanong-agent-api.onrender.com). Policy and prerequisite chats work through the
+  public site (5.7 s / 7.0 s warm). Development checks only; not institutional approval or a thesis result.
+- **Next action:** Task 9 phase close: exit-gate checks, whole-branch review, handoff, PR to the fork's `dev`.
 
 ## Delivered repairs
 

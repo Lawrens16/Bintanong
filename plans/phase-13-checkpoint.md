@@ -2,9 +2,9 @@
 artifact: phase-checkpoint
 phase: 13
 status: in_progress
-sequence: 15
+sequence: 16
 plan: plans/phase-13-hosted-llm-agent-plan.md
-head_commit: e3bf0a9d
+head_commit: 30cc5cc9
 working_tree: checkpoint staged for commit; head_commit is that commit's parent
 updated_at: 2026-11-15T17:00:00+08:00
 ---
@@ -127,10 +127,21 @@ updated_at: 2026-11-15T17:00:00+08:00
   agent app uses it and falls back to the source file name. RED 2 failed, GREEN; 458 passed. Real release:
   39 of 39 curricula named; browser search "Computer Science" finds "Bachelor of Science in Computer Science".
 
+- Task 8 part 4, deployment (owner created both projects, 15 Nov 2026): branch pushed to `origin`
+  (fast-forward, `9980c461`, then `30cc5cc9` so Vercel had a build of the branch). Render free web service
+  `bintanong-agent-api` (Blueprint from the branch; Singapore; manual deploys) at
+  https://bintanong-agent-api.onrender.com: `/health/live` and `/health/ready` 200. Vercel project at
+  https://bintanong.vercel.app, root `frontend`, production branch `feat/hosted-llm-agent`. First attempts
+  failed on configuration, not code: Vercel `API_INTERNAL_URL` missing (`connection_failed`), then Render
+  `BINTANONG_ALLOWED_ORIGINS` not yet the Vercel origin (`origin_not_allowed`). After the owner fixed both:
+  Vercel `/api/health` ready, `/api/curricula` lists named programs, "How do I get a class card?" answered in
+  English with 6 Charter sources (5.7 s), BSCS "pwede ko ba kunin cc5 kung bagsak ako sa cc4?" answered not
+  yet in Taglish with the CC 3/L question (7.0 s). Cold start and Render memory not yet measured on Render.
+  Local test container and `next dev` stopped.
+
 ## Current Task
 
-First push of `feat/hosted-llm-agent` to `origin` (owner approved 15 Nov 2026); then, with the owner, the
-Render and Vercel projects (each confirmed when it happens).
+Task 9: close the phase (exit-gate checks, whole-branch review, handoff, PR to the fork's `dev`).
 
 ## Repository State
 
