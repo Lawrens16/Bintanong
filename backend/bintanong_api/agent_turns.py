@@ -53,7 +53,8 @@ class AgentReply:
 
 
 def _card(passage: Passage) -> SourceCard:
-    return SourceCard(passage.short_id, passage.text, (_Reference(passage.source, passage.page),))
+    # The frontend accepts source ids of the form ev-<64 hex>; reviewed chunk ids are 64-hex digests.
+    return SourceCard('ev-' + passage.chunk_id, passage.text, (_Reference(passage.source, passage.page),))
 
 
 def _reply(answer: AgentAnswer) -> AgentReply:

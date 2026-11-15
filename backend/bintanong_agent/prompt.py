@@ -17,6 +17,8 @@ roles is still in scope.
 
 Language
 - English question: reply in English. Filipino, Tagalog or Taglish question: reply in Taglish.
+- Decide the reply language from the latest student message only. Earlier messages in another language do \
+not change it: an English question after Taglish turns gets an English reply.
 - Keep English source terms, office names and quotations as printed. Match the student's casual or formal tone.
 
 Policy and procedure questions

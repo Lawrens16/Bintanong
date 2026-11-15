@@ -115,8 +115,9 @@ def test_chat_answers_from_the_hosted_passages():
     response = client.post('/chat', json=chat_body('What does the synthetic reading say?'))
     assert response.status_code == 200
     events = response.content.decode('utf-8')
-    assert 'It is a synthetic field.' in events and '"sourceId":"C001"' in events
-    assert client.get('/sources/C001').json()['title'] == 'Synthetic Handbook.pdf'
+    chunk_id = spy.tables['chunks'][0]['chunk_id']
+    assert 'It is a synthetic field.' in events and f'"sourceId":"ev-{chunk_id}"' in events
+    assert client.get(f'/sources/ev-{chunk_id}').json()['title'] == 'Synthetic Handbook.pdf'
 
 
 def test_no_supabase_write_method_is_called():
@@ -125,7 +126,7 @@ def test_no_supabase_write_method_is_called():
     spy, client = started(model)
     client.get('/health/ready')
     client.post('/chat', json=chat_body('What does the synthetic reading say?'))
-    client.get('/sources/C001')
+    client.get('/sources/ev-' + spy.tables['chunks'][0]['chunk_id'])
     assert {call[0] for call in spy.calls} == {'select'}
     assert {call[2] for call in spy.calls} == {'runtime'}
     assert not {call[1] for call in spy.calls} & {'chunk_embeddings', 'selected_release_reviews'}

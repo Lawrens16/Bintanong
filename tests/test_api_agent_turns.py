@@ -1,7 +1,9 @@
 """Hosted agent chat turns: session history in, one committed exchange out, same stream as the original path."""
 import asyncio
+import dataclasses
 import importlib
 import json
+import re
 
 import pytest
 from fastapi.testclient import TestClient
@@ -43,8 +45,13 @@ def answered(text, *citations, status='answered', language='english'):
     return AgentAnswer(status, text, language, tuple(citations))
 
 
+FEE_CHUNK = 'b' * 64  # real chunk ids are 64 hex characters
+FEE_SOURCE = 'ev-' + FEE_CHUNK
+FRONTEND_SOURCE_ID = re.compile(r'^ev-[a-f0-9]{64}$')  # frontend/lib/student-contracts.ts sourceIdSchema
+
+
 def fee_passage():
-    return fixtures.make_corpus().get('C002')
+    return dataclasses.replace(fixtures.make_corpus().get('C002'), chunk_id=FEE_CHUNK)
 
 
 def new_session(store):
@@ -133,7 +140,8 @@ def test_reply_fits_the_existing_answer_parts():
     parts = answer_parts(reply, 'msg-a')
     assert parts[1] == {'type': 'text-delta', 'id': 'msg-a-text', 'delta': 'Pay at the cashier.'}
     assert [p for p in parts if p['type'] == 'source-document'] == [
-        {'type': 'source-document', 'sourceId': 'C002', 'mediaType': 'text/plain', 'title': 'Synthetic.pdf, p.3'}]
+        {'type': 'source-document', 'sourceId': FEE_SOURCE, 'mediaType': 'text/plain', 'title': 'Synthetic.pdf, p.3'}]
+    assert all(FRONTEND_SOURCE_ID.match(p['sourceId']) for p in parts if p['type'] == 'source-document')
     summary = next(p for p in parts if p['type'] == 'data-answer')['data']
     assert summary == {'status': 'answered', 'conditional': False, 'language': 'taglish', 'missingFields': [],
                        'notice': 'Hindi official university guidance.'}
@@ -167,15 +175,15 @@ def test_stream_emits_status_text_sources_and_answer_parts():
     assert kinds == ['start', 'data-status', 'data-status', 'text-start', 'text-delta', 'text-end',
                      'source-document', 'data-answer', 'finish']
     assert [p['data']['stage'] for p in parts if p['type'] == 'data-status'] == ['searching', 'writing']
-    assert parts[4]['delta'] == 'Pay at the cashier.' and parts[6]['sourceId'] == 'C002'
+    assert parts[4]['delta'] == 'Pay at the cashier.' and parts[6]['sourceId'] == FEE_SOURCE
     assert parts[7]['data']['status'] == 'answered' and parts[7]['data']['language'] == 'en'
 
 
 def test_sources_endpoint_serves_cited_passage():
     client = app_client(FakeAgent(answered('Pay at the cashier.', fee_passage())))
-    assert client.get('/sources/C002').status_code == 404  # nothing is served before an answer cites it
+    assert client.get('/sources/' + FEE_SOURCE).status_code == 404  # nothing is served before an answer cites it
     client.post('/chat', json=body('Where do I pay the fee?'))
-    card = client.get('/sources/C002').json()
-    assert card['sourceId'] == 'C002' and card['title'] == 'Synthetic.pdf' and card['page'] == 3
+    card = client.get('/sources/' + FEE_SOURCE).json()
+    assert card['sourceId'] == FEE_SOURCE and card['title'] == 'Synthetic.pdf' and card['page'] == 3
     assert 'Pay the enrolment fee at the cashier.' in card['excerpt']
-    assert client.get('/sources/C001').status_code == 404
+    assert client.get('/sources/C002').status_code == 404  # short ids are not source ids
