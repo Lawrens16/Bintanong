@@ -3,6 +3,7 @@ import { ArrowLeft, Check, ChevronDown, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { StudentCurriculum } from "@/lib/student-contracts";
 import { curriculumForStartYear, groupPrograms, programShortName, startYearOptions, type ProgramChoice, type StartYear } from "@/lib/programs";
+import { programListText } from "@/lib/student-progress";
 
 export type CurriculumState = "loading" | "ready" | "failed";
 
@@ -75,7 +76,7 @@ function PickerContent({ curricula, current, status, busy, onRetry, onSave, onTi
         <span className="sr-only">Search programs</span>
         <input id={searchId} type="search" enterKeyHint="search" placeholder="Search programs or colleges" autoComplete="off" value={query} onChange={event => setQuery(event.target.value)} disabled={status !== "ready"} />
       </label>
-      {status === "loading" && <p role="status">Loading programs…</p>}
+      {status === "loading" && <LoadingPrograms />}
       {status === "failed" && <div className="curriculum-status" role="alert"><p>We couldn&apos;t load the program list. Try again in a moment.</p><Button variant="outline" onClick={onRetry}>Try again</Button></div>}
       {status === "ready" && !curricula.length && <p role="status">No programs are available yet.</p>}
       {status === "ready" && !!curricula.length && <div className="program-groups" aria-label="Programs by college">
@@ -107,4 +108,11 @@ function PickerContent({ curricula, current, status, busy, onRetry, onSave, onTi
         })}
       </div>}
     </>;
+}
+
+/** "Loading programs…", then a waking-up explanation once the wait passes ten seconds. */
+function LoadingPrograms() {
+  const [started] = useState(() => Date.now()), [now, setNow] = useState(started);
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer); }, []);
+  return <p role="status">{programListText(now - started)}</p>;
 }

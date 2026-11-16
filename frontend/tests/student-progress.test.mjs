@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { progressLabel, progressStages, WAKING_UP, WAKING_UP_AFTER_MS } from '../lib/student-progress.ts';
+import { programListText, progressLabel, progressStages, WAKING_UP, WAKING_UP_AFTER_MS } from '../lib/student-progress.ts';
 import { sendStudentMessage } from '../lib/student-transport.ts';
 
 const request = { id: 'msg-test', text: 'A synthetic question', programId: 'program-a', curriculumId: 'curriculum-a' };
@@ -41,4 +41,16 @@ test('every progress stage has its own student-facing line', () => {
 test('a slow first response is explained after ten seconds', () => {
   assert.equal(WAKING_UP_AFTER_MS, 10_000);
   assert.match(WAKING_UP, /waking up/i);
+});
+
+// Owner, 16 Nov 2026: the program list waited 90 s on a sleeping free server with only "Loading programs…" shown.
+test('the program list explains a long wait as the server waking up', () => {
+  assert.equal(programListText(0), 'Loading programs…');
+  assert.equal(programListText(WAKING_UP_AFTER_MS - 1), 'Loading programs…');
+  assert.match(programListText(WAKING_UP_AFTER_MS), /waking up the server/i);
+  assert.match(programListText(WAKING_UP_AFTER_MS), /up to 2 minutes/);
+});
+
+test('the reply wait message matches the measured wake-up time', () => {
+  assert.match(WAKING_UP, /up to 2 minutes/);
 });
