@@ -44,7 +44,8 @@ existing record), not only the email as first written. Owner chose temporary rec
   this when guest mode is off, so it is a regression check, not a RED/GREEN pair.
 - Backend agent + API test files: 448 passed (430 before). Frontend `npm run test:ui`: 127 of 127 (121 before);
   `npx tsc --noEmit` exit 0.
-- Full suite: FULL_SUITE_LINE
+- Full suite: 233 failed / 36 errors, the identical id set as the Phase 13 baseline (`comm` empty both ways);
+  6,659 passed vs 6,631 (+28 new). Same venv, `--continue-on-collection-errors`; logs in `audit-evidence/p13-security-20261116/full-suite/`.
 
 ## Attack check (local server on the real release, DeepSeek `deepseek-flash`)
 
