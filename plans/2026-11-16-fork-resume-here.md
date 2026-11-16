@@ -4,6 +4,15 @@ Owner, 16 Nov: "just note that whenever someone is gonna work in this project ag
 this maybe a week later." Read this first, then `plans/INDEX.md` and current progress. Check Git and the live site
 before trusting anything below; it is a snapshot.
 
+## Raise with the owner at the start of every session (owner, 16 Nov 2026)
+
+**Keep-awake pinger for Render (not done yet).** Owner: "bring this up whenever i start another session in this
+project ... because option 1 is a good idea". Render free sleeps after 15 quiet minutes and the first request
+then waits 90-100 s (the program list showed "Loading programs…" that long). Fix: a free cron-job.org job opens
+`https://bintanong-agent-api.onrender.com/health/live` every 10 minutes (one always-on service fits Render's 750
+free hours a month). Needs the owner to create the cron-job.org account; give them the exact settings. Remove
+this section once it is set up. (The site now explains the wait after 10 s; that is a stopgap, not the fix.)
+
 ## Where things stand
 
 - **Live and public:** https://bintanong.vercel.app (Vercel) with the backend on Render free
@@ -26,7 +35,7 @@ before trusting anything below; it is a snapshot.
    `feat/hosted-llm-agent`, so it is unaffected. Open a second PR when the owner wants `main` current.
 2. Known gap in public mode: a script calling Render directly with a typed-in `Origin` and no cookie counts as a new
    person on every request; only the 150-a-day site cap bounds it. Switching sign-in on closes it.
-3. Render free cold start: over 100 s measured on 16 Nov for the first request after sleep.
+3. Render free cold start: 90-100 s after sleep; see the keep-awake item at the top.
 4. Optional from Phase 13: live-test GPT/Gemini/Claude when a key exists; read Render's Metrics tab under use.
 5. Thesis-side items (scorer recall gap, RAGAS decisions, eight-failures handoff) are separate from this fork.
 

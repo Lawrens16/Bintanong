@@ -72,8 +72,9 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
 - Live (16 Nov, 22:40): Vercel public again (`/chat` 200, `/login` -> `/`, three headers); Render on the new code
   with guests on (`/openapi.json` 404; 1,001-character question 422); a guest question answered through the site
   in 3.9 s.
-- **Next action:** none pending. Optional: open a PR to bring `main` up to date; switch sign-in on only when the
-  owner decides (parked note).
+- 16 Nov: program list showed only "Loading programs…" for 90 s while Render woke; the picker now says the server
+  is waking up after 10 s (frontend 128/128, TypeScript clean). Keep-awake pinger left for the owner (resume note).
+- **Next action:** at the next session, remind the owner about the keep-awake pinger; PR #2 waits for review.
 
 ## Delivered repairs
 
