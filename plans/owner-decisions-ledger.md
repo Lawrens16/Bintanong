@@ -8,6 +8,13 @@ AGENTS.md, current progress or dated review records supersede older entries wher
 
 ## Owner decisions to preserve across CLI sessions
 
+- 16 November 2026, later (fork: sign-in parked, site public). Owner: "can we just scrap that login thing, dont
+  entirely scrap it but save it somewhere if i've finally made up my mind in implementing this login thing, for
+  now keep it public." So: guest chat stays on; the PSU sign-in code stays in the repo, switched off; the pg_cron
+  cleanup job and extension were removed from Supabase (SQL kept in `supabase/hosted/`), so the database is as it
+  was before 16 Nov. Daily limits and the hardening stay on. The sign-in decisions below (accounts, limits, 7-day
+  records, contact) remain settled for when it is switched on. How: `plans/2026-11-16-school-sign-in-parked.md`.
+
 - 16 November 2026 (fork: temporary sign-in records and data contact). After review showed Google sign-in stores
   the name, school email and profile photo link (not only the email), the owner asked: "can we not make them
   really temporary?" and chose: delete a sign-in record 7 days after it was last used, by an automatic Supabase

@@ -66,8 +66,11 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
 - 16 Nov privacy follow-up: sign-in also stores name and photo link; owner chose records deleted 7 days after
   last use (pg_cron job `delete-unused-sign-ins`, active) and bintanongbinturong@gmail.com for requests; notice
   updated (frontend 127/127).
-- **Next action:** push and merge into PR #1, then the owner deploys Render with `BINTANONG_ALLOW_GUESTS` removed;
-  then the live recheck with a real school sign-in.
+- 16 Nov, later: owner parked the sign-in and kept the site public ([note](../2026-11-16-school-sign-in-parked.md));
+  guest chat back on, limits and hardening kept; Supabase cleanup job and pg_cron removed (database as before).
+  Frontend 126/126, TypeScript clean.
+- **Next action:** owner keeps `BINTANONG_ALLOW_GUESTS=1` on Render and deploys by hand (brings the limits and
+  hardening live); then a live recheck.
 
 ## Delivered repairs
 

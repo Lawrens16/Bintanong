@@ -10,7 +10,7 @@
   Separate from the thesis; the original Gemma path and Supabase stay unchanged.
 - Fork security work (owner-approved 16 Nov, no phase opened): [plan and findings](2026-11-16-hosted-agent-security-plan.md),
   [results and go-live steps](2026-11-16-hosted-agent-security-results.md);
-  school sign-in, daily question limits, hardening. Branch `feat/agent-sign-in-limits`.
+  daily limits and hardening live; school sign-in built but [parked](2026-11-16-school-sign-in-parked.md).
 - Phase 12 research/software evaluation write-up complete with disclosures.
   [Plan](phase-12-evaluation-writeup-plan.md), [superseded checkpoint](phase-12-checkpoint.md),
   [latest final handoff](phase-12-handoff.md), [report](../docs/evaluation/phase12-evaluation-report.md).

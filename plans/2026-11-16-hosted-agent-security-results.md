@@ -102,3 +102,14 @@ settings). Script, transcripts and logs: ignored `audit-evidence/p13-security-20
    every guest.
 5. Recheck live: the typed-in-Origin request returns 401, `/openapi.json` 404, a school account can ask, a
    personal Gmail is refused.
+
+## Parked, same evening
+
+Owner chose to keep the site public for now and park the sign-in ([note](2026-11-16-school-sign-in-parked.md)).
+`5801c990` (sign-in only) reached Vercel: `/chat` redirected to `/login`, but the sign-in button showed
+"unavailable" because the Vercel Production Supabase variables were missing, so nobody could chat until the
+public mode was pushed. Render was never deployed with guests off. Supabase: job unscheduled and pg_cron dropped
+(`cron.job` gone, no `cron` schema, the one sign-in record untouched, advisor unchanged).
+
+Public mode keeps the limits and hardening, but a direct `POST /chat` with a typed-in Origin and no cookie is
+again accepted, and each such request counts as a new person; only the 150-a-day site cap bounds it.
