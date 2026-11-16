@@ -317,6 +317,9 @@ permission or authorization to execute institutional rules in Phase 06.
      this turn. Unknown or missing citations get one retry, then an honest "couldn't verify, ask the office".
   4. **Excluded-audience block.** Medicine, Law, graduate, laboratory school and staff-only questions get the
      fixed undergraduate-scope notice from code (existing `EXCLUDED_PROGRAM_CUES`).
+- Owner, 16 Nov 2026: the hosted site requires PSU Google sign-in (`@psu.palawan.edu.ph`), with 20 questions per
+  person and 150 per site per day, counted in memory. The database rule above is amended only for Supabase's own
+  sign-in records and one redirect-URL entry. See `plans/2026-11-16-hosted-agent-security-plan.md`; do not re-ask.
 - Unchanged: undergraduate scope, read-only advisory boundary, source-gap and unknown-versus-unmet rules,
   English/Taglish replies, private-upload isolation, TDD, Conventional Commits without AI attribution. Never
   push to `upstream` (`bintanong420/Bintanong`). Creating Render/Vercel projects, the first push of a new

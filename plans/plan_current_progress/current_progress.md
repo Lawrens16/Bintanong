@@ -53,8 +53,13 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
 - 16 Nov: `BINTANONG_ALLOWED_ORIGINS` accepts a trailing slash (RED 1 failed, then agent + API test files 430
   passed; full suite not rerun). Handoff prerequisites brought up to date; merged local milestone branches
   deleted, `agent-m2`..`agent-m8` tags kept. Not pushed or deployed.
-- **Next action:** owner approves the security plan (sign-in limited to the school domain, per-person question
-  limits, security review); owner reviews/merges PR #1 when ready.
+- 16 Nov security check (read-only): the Render backend accepted a direct `POST /chat` with a typed-in `Origin`
+  header and no cookie, so guests were unlimited; `/openapi.json` public; no request-size limit; cold start over
+  100 s. Supabase: RLS on every table, public key read-only. Owner approved the
+  [security plan](../2026-11-16-hosted-agent-security-plan.md): sign-in only, 20 per person / 150 per site per
+  day, counts in memory. Branch `feat/agent-sign-in-limits`.
+- **Next action:** implement plan tasks 2-6 test-first (daily limits, guests off, hardening, frontend, attack
+  check); then the owner's go-live steps (Supabase redirect URL, Render env and deploy).
 
 ## Delivered repairs
 

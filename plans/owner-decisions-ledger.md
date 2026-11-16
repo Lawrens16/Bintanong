@@ -8,6 +8,16 @@ AGENTS.md, current progress or dated review records supersede older entries wher
 
 ## Owner decisions to preserve across CLI sessions
 
+- 16 November 2026 (fork: school sign-in and question limits). Owner asked for a security check and: "maybe have
+  a login system whereas we set only @psu.palawan.edu.ph corp gmail that the school provides and give them a
+  limited amount of queries to make?" A read-only check showed the backend could be called directly without
+  limit. Owner chose: sign-in only (no guest chat on the hosted site); 20 questions per person per day; 150 per
+  day for the whole site; counts kept in server memory (they restart when the free server sleeps; accepted).
+  The existing PSU Google sign-in is switched back on for the fork (it was off since 4 Nov). This amends the
+  fork's "No Supabase change" rule only for Supabase's own sign-in records (school email) and one redirect-URL
+  entry; still no migrations, tables, app writes or service-role key. The privacy notice says sign-in stores
+  the school email. Plan: `plans/2026-11-16-hosted-agent-security-plan.md`. Not legal or institutional sign-off.
+
 - 15 November 2026 (fork: no grades or identity; general privacy notice). After reviewing that the hosted agent
   sends questions to a third-party model API, the owner chose to generalize the notice ("make it generalized?
   Like not to specify the deepseek") and to bar grades ("what if we just barred them from entering any grades?

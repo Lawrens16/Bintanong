@@ -8,6 +8,8 @@
   [PRD](2026-11-15-hosted-llm-fork-prd.md), [hosting research](2026-11-15-phase-13-pre-phase-research.md).
   Worktree: Orca workspace `Bintanong-personal/dev`, branch `feat/hosted-llm-agent` (push to `origin` only).
   Separate from the thesis; the original Gemma path and Supabase stay unchanged.
+- Fork security work (owner-approved 16 Nov, no phase opened): [plan and findings](2026-11-16-hosted-agent-security-plan.md);
+  school sign-in, daily question limits, hardening. Branch `feat/agent-sign-in-limits`.
 - Phase 12 research/software evaluation write-up complete with disclosures.
   [Plan](phase-12-evaluation-writeup-plan.md), [superseded checkpoint](phase-12-checkpoint.md),
   [latest final handoff](phase-12-handoff.md), [report](../docs/evaluation/phase12-evaluation-report.md).
