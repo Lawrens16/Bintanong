@@ -32,7 +32,7 @@ this section once it is set up. (The site now explains the wait after 10 s; that
 ## Open items (none blocking)
 
 1. `main` is behind: PR #1 was merged into `main` at `7cff92c2` before the 16 Nov work. The site deploys from
-   `feat/hosted-llm-agent`, so it is unaffected. Open a second PR when the owner wants `main` current.
+   `feat/hosted-llm-agent`, so it is unaffected. PR #2 (16 Nov) brings `main` up to date; it waits for the owner.
 2. Known gap in public mode: a script calling Render directly with a typed-in `Origin` and no cookie counts as a new
    person on every request; only the 150-a-day site cap bounds it. Switching sign-in on closes it.
 3. Render free cold start: 90-100 s after sleep; see the keep-awake item at the top.
