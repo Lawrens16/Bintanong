@@ -22,7 +22,10 @@ services:
         value: deepseek
       - key: BINTANONG_ALLOWED_ORIGINS  # the Vercel site origin, e.g. https://<project>.vercel.app
         sync: false
-      # No BINTANONG_ALLOW_GUESTS: chatting needs a verified @psu.palawan.edu.ph Google sign-in (owner, 16 Nov 2026).
+      # Public for now (owner, 16 Nov 2026). Removing this makes chat need a PSU Google sign-in; see
+      # plans/2026-11-16-school-sign-in-parked.md before doing that.
+      - key: BINTANONG_ALLOW_GUESTS
+        value: "1"
       - key: BINTANONG_DAILY_QUESTIONS_PER_PERSON  # rolling 24 hours, counted in memory
         value: "20"
       - key: BINTANONG_DAILY_QUESTIONS_TOTAL  # everyone together

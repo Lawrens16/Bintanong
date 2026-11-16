@@ -1,9 +1,10 @@
 type User = { email?: string; email_confirmed_at?: string | null; identities?: { provider?: string; identity_data?: Record<string, unknown> }[] };
-// Owner, 16 Nov 2026 (hosted fork): chatting needs a PSU Google sign-in and there is no guest chat, so one
-// person cannot spend the shared model balance. (Sign-in was off from 4 Nov; while false, nobody reaches the
-// sign-in page or starts an OAuth flow.) The API enforces the same rule; these only choose pages and controls.
-export const SIGN_IN_ENABLED = true;
-export const GUESTS_ALLOWED = false;
+// Owner, 16 Nov 2026: the site stays public for now. The school sign-in (PSU Google only, no guest chat) is built
+// and kept switched off; `plans/2026-11-16-school-sign-in-parked.md` lists every step to switch it on. While
+// SIGN_IN_ENABLED is false nobody reaches the sign-in page or starts an OAuth flow. The API enforces access itself
+// (`BINTANONG_ALLOW_GUESTS`); these only choose pages and controls.
+export const SIGN_IN_ENABLED = false;
+export const GUESTS_ALLOWED = true;
 
 export function pageRedirect(pathname: string, permitted: boolean, signInEnabled = SIGN_IN_ENABLED, guestsAllowed = GUESTS_ALLOWED) {
   if (pathname === "/login" && !signInEnabled) return "/";
