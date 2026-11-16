@@ -1,0 +1,30 @@
+# Render Blueprint for the hosted-LLM agent API (Phase 13 fork). Free plan, no card.
+# Secrets use `sync: false`: Render asks for them once when the Blueprint is created; they are never in Git.
+# Deploys are started by hand (autoDeployTrigger: off), so each deploy is confirmed by the owner.
+services:
+  - type: web
+    name: bintanong-agent-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./docker/agent-api.Dockerfile
+    dockerContext: .
+    healthCheckPath: /health/live
+    autoDeployTrigger: "off"
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY  # the public anon/publishable key; a service-role key is refused at startup
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: BINTANONG_LLM_PROVIDER
+        value: deepseek
+      - key: BINTANONG_ALLOWED_ORIGINS  # the Vercel site origin, e.g. https://<project>.vercel.app
+        sync: false
+      - key: BINTANONG_ALLOW_GUESTS
+        value: "1"
+      - key: BINTANONG_RELEASE_ID
+        value: p12-research-faqsplit-20261030
+      - key: BINTANONG_RESEARCH_AUTHORIZATION
+        value: research-owner-20261029

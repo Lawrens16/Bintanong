@@ -1,9 +1,56 @@
 # Current progress
 
-Updated 6 November 2026. Development: `p12-dev` / `p12-post-gathering-fixes`.
-Last full snapshot before condensation: `d2ad9fef` (recover with `git show`).
-Gathering checkout and owner USG notes remain separate. No numbered phase is active;
-Phase 12 research/software write-up is complete with disclosures; Phase 13 is cancelled.
+Updated 15 November 2026. Phase 13 hosted-LLM agent (personal fork) closed with a [final handoff](../phase-13-handoff.md); branch `feat/hosted-llm-agent`.
+Last full snapshot before condensation: `d2ad9fef`; before the Phase 13 entries: `f1fe3f2b` (recover with `git show`).
+Gathering checkout and owner USG notes remain separate. Phase 12 research/software write-up is complete with
+disclosures; the original build's Phase 13 deployment stays cancelled.
+
+## Phase 13: hosted-LLM agent fork (15 Nov)
+
+Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-llm-agent-plan.md),
+[checkpoint](../phase-13-checkpoint.md), [PRD draft](../2026-11-15-hosted-llm-fork-prd.md),
+[hosting research](../2026-11-15-phase-13-pre-phase-research.md).
+- Task 0 done: branch cut from `Lawrens16/dev` at `f1fe3f2b` (not pushed); PRD drafted; plan and checkpoint
+  created; fork decisions recorded in `AGENTS.md` and the ledger; thesis pp. 17-18 and routing PNG re-read,
+  discrepancies recorded in the checkpoint. Documentation only; no backend, frontend or test file changed.
+- Verification: `phase_state.py inspect` valid at start; `phase_state.py validate` valid after the documents.
+- Task 1 probes done (read-only, anon key, GET only; details in the checkpoint): 560 chunks readable;
+  the existing snapshot loader fails unless `source_spans` (2529 rows) is read in pages, because anon reads
+  return 1000 rows at most; process memory about 186 MB with all 39 curricula; chunk rows give 159 topic
+  groups; `janus-swi` needs SWI-Prolog 9.1.12+ so Debian's apt package (9.0.4) is out; provider base URLs
+  and model ids recorded.
+- Owner, 15 Nov: PRD approved; topic directory option A (from chunk rows); the fork is separate from the
+  thesis and not used in the final defense. No Supabase change; push only to `origin`.
+- Tasks 2-5 done and merged locally (tags `agent-m2`..`agent-m5`, nothing pushed): providers/settings,
+  corpus/search, curriculum tools, and the tool-using loop with the four guards (`3434ae13`). Agent test files
+  plus transport/adapter tests: 159 passed. Task 5 had no separate reviewer; full suite not run.
+- Task 6 done (`a46d812a`, tag `agent-m6`): `load_agent_app` serves the agent through the existing API and stream;
+  API + agent tests 443 passed; read-only start on the real release took 44 s at 187 MB with 39 curricula.
+- Typed grades now reach the rule check (`5a566bf7`, 447 passed; real BSCS CC 5/L check behaves as printed).
+- Open: picker names are source file names (see checkpoint). Tasks 5-6 had no separate reviewer.
+- Task 7 done (tag `agent-m7`): frontend accepts and labels `searching` / `checking`, plus a waking-up line
+  after 10 s; frontend tests 118 of 118, TypeScript check clean.
+- Cost changes (`c1454a50`, 455 passed): DeepSeek thinking off by default, shared prompt prefix first for
+  caching, token usage recorded per answer. Owner's DeepSeek balance: $1.41.
+- Live check (15 Nov): 14 DeepSeek turns, all key facts present in cited passages, eligibility answers follow
+  the rule results. Thinking off: $0.0136 at peak for 14 turns (about $0.001 per question), 88% cached,
+  1.5-7 s; thinking on cost 71% more for slightly fuller wording. Thinking stays off. Not an accuracy claim.
+- Container image + `render.yaml` done (`4f6a5e0d`): image runs under a 512 MB cap at about 158 MB, ready in 41 s,
+  answers over HTTP in 4-5 s. Nothing pushed or deployed.
+- Browser run done: two defects fixed (cited answers were cut off by the frontend's source-id rule; English
+  after Taglish replied in Taglish), 456 passed, rechecked in the browser. Picker now shows program names (`d667091a`).
+- Deployed (15 Nov): https://bintanong.vercel.app (Vercel, branch `feat/hosted-llm-agent`) with the backend
+  on Render free (https://bintanong-agent-api.onrender.com). Policy and prerequisite chats work through the
+  public site (5.7 s / 7.0 s warm). Development checks only; not institutional approval or a thesis result.
+- Phase closed (15 Nov): full suite identical to the starting commit (233 failed / 36 errors, same ids; +157
+  passing new tests); Supabase newest rows dated before the phase; handoff records the gaps (DeepSeek-only
+  live check, guard 2 not exercised live, Render cold start/memory unread, privacy-notice question).
+- Owner, 15 Nov: PR #1 opened on the fork (`feat/hosted-llm-agent` -> `main`; no `dev` branch); repo stays public;
+  no grades or identity: uploads off, identifiers removed before the model, general privacy notice (467 backend /
+  121 frontend tests pass; browser checked). Decision in `plans/owner-decisions-ledger.md`.
+- Live (15 Nov, after the owner's Render deploy): Render and Vercel `/uploads` return 404; public pages show the
+  new notice; a chat containing a student number and email answered CS 6 eligibility correctly (6.6 s).
+- **Next action:** none pending; owner reviews/merges PR #1 when ready. Optional: Render cold-start timing.
 
 ## Delivered repairs
 
@@ -76,7 +123,7 @@ precision .896, context recall .754 (optimistic), factual correctness precision 
 8 Nov: Query 1 three-language worked example tried (3a5f6084) and reverted; owner keeps the Query 9
 version (af3836e8), copied to for_manuscript/Benchmarks_results/RAGAS.pdf with the BATAYAN section.
 
-## Next action
+## Earlier continuation (6 Nov, original build)
 
 Index committed `11b2e015`; 3217 proxy chat returned HTTP200 with `system_information`.
 [Shifting repair](../2026-11-06-program-shifting-repair.md): exact “Pano po lumipat ng kurso?”

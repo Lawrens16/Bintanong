@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SIGN_IN_ENABLED } from "@/lib/auth-policy";
+import { informationAnswer } from "@/lib/privacy-copy";
 import { ArrowUpRight, CheckCircle2, BookOpen, GraduationCap, ChevronDown, Menu, X } from "lucide-react";
 
 // Illustrative only: these describe how Bintanong builds an answer, not institutional facts.
@@ -34,7 +35,7 @@ const demoPresets = [
     badge: "Needs your details",
     details: [
       "Asks for your program and curriculum when it doesn’t have them",
-      "Uses the subjects you list or upload as passed",
+      "Uses the subjects you say you passed",
     ],
     advice: "Course details you share stay in temporary memory for this session.",
   },
@@ -59,7 +60,7 @@ const faqs = [
   },
   {
     q: "What happens to my information?",
-    a: "No account is needed. Chat messages, uploaded files, and course details stay in temporary memory, separate from institutional knowledge, and are not stored permanently. Start a new chat to clear them when you finish.",
+    a: informationAnswer,
   },
 ];
 

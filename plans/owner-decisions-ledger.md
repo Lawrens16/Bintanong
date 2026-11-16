@@ -8,6 +8,56 @@ AGENTS.md, current progress or dated review records supersede older entries wher
 
 ## Owner decisions to preserve across CLI sessions
 
+- 15 November 2026 (fork: no grades or identity; general privacy notice). After reviewing that the hosted agent
+  sends questions to a third-party model API, the owner chose to generalize the notice ("make it generalized?
+  Like not to specify the deepseek") and to bar grades ("what if we just barred them from entering any grades?
+  Because we are like after all asking if they passsed or no ... We cannot even identify them"), approved with
+  "ye sure". So, in the fork only: grade-file uploads are switched off (backend routes and frontend controls);
+  email addresses, phone numbers and student numbers are removed before text reaches the model; the model asks
+  only passed / failed / enrolled / not taken; the privacy notice and FAQ say answers use a third-party AI
+  service and ask for no name, student number, grades or other personal details. The repository stays public
+  (owner: "im not going to privatize it"). This is the owner's data-minimization choice, not legal sign-off.
+
+- 15 November 2026 (fork purpose, PRD and topic directory). Owner: "this will be separate from the thesis, like
+  it will not be used in the final defense of ours since it will not be implementing the algorithsm such as knn
+  and cosign but it will be a working version that may be used in the public to contribute 'something' to the
+  university". "I approve the PRD." "yeah do Option A." So: the fork is not thesis evidence and is not part of
+  the final defense; its results are never reported as thesis results. The PRD
+  `plans/2026-11-15-hosted-llm-fork-prd.md` is approved. The topic directory is derived from the chunk rows
+  (group id plus the printed service title where present); no derived catalogue file. Possible public use is
+  the owner's intent, not university approval; each deploy is still confirmed with the owner.
+
+- 15 November 2026 (fork: hosted-LLM agent, Phase 13 of the personal fork `Lawrens16/Bintanong`). The owner
+  approved the plan now saved as `plans/phase-13-hosted-llm-agent-plan.md` and asked to implement it from
+  Task 0. Decisions from that planning session, as recorded in the approved plan:
+  - Frontend on Vercel Hobby, backend on Render free (512 MB). No card, no cost.
+  - Tool-using chat agent; the LLM judges which chunks to use and how to word the reply.
+  - Online retrieval = topic directory + keyword search over the same Supabase chunks. The SEA-LION embedder
+    cannot fit in 512 MB and Hugging Face Docker Spaces now need a paid plan. Vector search stays available
+    behind the same interface where the embedder fits (the laptop).
+  - All four providers (DeepSeek, GPT, Gemini, Claude), DeepSeek first.
+  - Four guards stay in code, with guard 1 loosened as the owner directed.
+  - Database rule, verbatim: "No Supabase change. No migrations, no writes, no RPC that writes, no
+    service-role key read by the agent app. Reads use the anon key only. Supabase MCP is used for read-only
+    checks only."
+  - Guard list, verbatim:
+    1. "Eligibility comes from the reviewed rules (loosened). Before answering "can I take X", the agent must
+       have called the curriculum tool this turn. The tool returns the printed prerequisite rule and the Prolog
+       evaluation; the LLM reads them and decides and words the answer itself. Course names are matched
+       forgivingly ("cc5", "CC-5", "cc 5/l", a title) and the LLM picks from candidates, so a missing space or
+       a dash no longer ends in "unknown". No byte-for-byte host verdict line and no wording regex."
+    2. "Private data never leaks. Uploaded or typed grades stay in the owning session; code checks they never
+       appear in citations, source cards or logs (existing `foreign_ids`)."
+    3. "Policy answers cite a retrieved chunk. A policy/procedure answer must cite at least one chunk fetched
+       this turn. Unknown or missing citations get one retry, then an honest "couldn't verify, ask the office"."
+    4. "Excluded-audience block. Medicine, Law, graduate, laboratory school and staff-only questions get the
+       fixed undergraduate-scope notice from code (existing `EXCLUDED_PROGRAM_CUES`)."
+  - In this fork these supersede the Gemma-only, strict-guard and thesis-technology rules, including the
+    4 Nov 2026 host-written prerequisite wording and the 29 Oct 2026 "no hosting" note, which keep applying to
+    the original build. The original Gemma path stays untouched and runnable. Push only to `origin`; never to
+    `upstream`. Outward steps (Render/Vercel projects, first push of a new branch, deploys) are confirmed with
+    the owner when they happen. Not institutional approval; no inherited evaluation figures.
+
 - 26 October 2026 (Phase11 expansion review): owner says "lets gather the possible topics we can
   expand into, including the citizen charter. Then later we will review in bulk". Gather the combined
   undergraduate topic catalogue now; defer source-field approval questions/review until later.

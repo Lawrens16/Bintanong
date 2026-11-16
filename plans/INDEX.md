@@ -2,11 +2,17 @@
 
 ## Current state
 
-- Phase 12 research/software evaluation write-up complete with disclosures; no active implementation phase.
+- No active phase. Latest final handoff: [Phase 13 hosted-LLM agent (fork)](phase-13-handoff.md), complete
+  with disclosures; deployed at https://bintanong.vercel.app (backend on Render free). Next permitted phase: 14.
+  [Plan](phase-13-hosted-llm-agent-plan.md), [superseded checkpoint](phase-13-checkpoint.md),
+  [PRD](2026-11-15-hosted-llm-fork-prd.md), [hosting research](2026-11-15-phase-13-pre-phase-research.md).
+  Worktree: Orca workspace `Bintanong-personal/dev`, branch `feat/hosted-llm-agent` (push to `origin` only).
+  Separate from the thesis; the original Gemma path and Supabase stay unchanged.
+- Phase 12 research/software evaluation write-up complete with disclosures.
   [Plan](phase-12-evaluation-writeup-plan.md), [superseded checkpoint](phase-12-checkpoint.md),
   [latest final handoff](phase-12-handoff.md), [report](../docs/evaluation/phase12-evaluation-report.md).
 - Hosted research560 active; corrected78 retained as rollback. [Activation results](2026-10-30-hosted-560-activation-results.md).
-  This is not institutional approval or public deployment. Phase 13 deployment cancelled by owner.
+  This is not institutional approval or public deployment. The original build's Phase 13 deployment stays cancelled.
 - Post-Phase-12 accuracy work: [current handoff](2026-10-30-eight-failures-handoff.md) (open): common-query
   readiness for the student sessions, new-machine setup and runs to do.
 - Academic Recovery Planner (owner plan, 4 Nov): [ingestion and thesis-bounded scope](2026-11-04-academic-recovery-planner-ingestion.md);
@@ -16,12 +22,13 @@
   [results and verification](2026-10-30-test-suite-audit-results.md).
 - Worktree p12 / `p12-evaluation-harness`; [current progress](plan_current_progress/current_progress.md).
   Immutable master: [master plan](master_implementation_plan_original_long.md).
-  Structural next_phase13 is cancelled; no next implementation phase authorized.
+  Structural next_phase13 is used by the fork's Phase 13 above.
 
 ## Resume order
 
 1. Run `python .agents/skills/bintanong-phase-handoff/scripts/phase_state.py inspect --repo .`.
-2. Read current progress, Phase12 handoff and relevant master sections; compare with fresh Git evidence.
+2. Read current progress, the Phase 13 handoff and plan, Phase 12 handoff and relevant master sections;
+   compare with fresh Git evidence.
 3. For recovery, use activation results and [Claude's executor handoff](2026-10-30-hosted-560-codex-handoff.md).
    Do not rerun staging/activation or regenerate bound review artifacts.
 4. Consult relevant Context thesis pages/routing PNG on phase resume; preserve undergraduate/release boundaries.
@@ -46,6 +53,7 @@ real-source exits; ledger validity alone does not prove source readiness.
 | 10 | Private files and session context | complete offline research/software; photos unsupported; HTTP wiring in Phase 11; institutional release held | [Plan](phase-10-private-files-session-plan.md) | [Superseded](phase-10-checkpoint.md) | [Complete](phase-10-handoff.md) |
 | 11 | Backend API, frontend integration, answer accuracy | complete with disclosures (photos unsupported, 24.2 rerun not done, hosted 560 activation deferred) | [Plan](phase-11-backend-api-plan.md) | [Superseded](phase-11-checkpoint.md) | [Complete](phase-11-handoff.md) |
 | 12 | Evaluation write-up | complete with disclosed research gaps | [Plan](phase-12-evaluation-writeup-plan.md) | [Superseded](phase-12-checkpoint.md) | [Complete](phase-12-handoff.md) |
+| 13 | Hosted-LLM agent (fork) | complete with disclosures; deployed; not a thesis result | [Plan](phase-13-hosted-llm-agent-plan.md) | [Superseded](phase-13-checkpoint.md) | [Complete](phase-13-handoff.md) |
 
 ## Read only when relevant
 
@@ -63,4 +71,5 @@ real-source exits; ledger validity alone does not prove source readiness.
 
 Compact snapshots follow owner17Oct direction; exact decisions/history remain in dated records and Git.
 Last full index before this condensation: `62ecb96`; full progress snapshot: `76d5a92`.
+Index and progress before the Phase 13 fork entries: `f1fe3f2b`.
 Earlier full checkpoints: Phase10 `13cf4b5`; Phase09 `e28eb5d`; Phase08 `9606319`; Phase07 `73cf70a`.

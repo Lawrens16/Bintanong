@@ -6,12 +6,14 @@ import { ChevronDown, ClipboardList, Ellipsis, FolderOpen, GraduationCap, Info, 
 import { clearStudentSession, confirmStudentFile, getStudentCurricula, removeStudentFile, sendStudentMessage, uploadStudentFile } from "@/lib/student-transport";
 import { StudentTransportError, type StudentAnswer, type StudentChoice, type StudentCurriculum, type StudentScope, type StudentSourceSummary } from "@/lib/student-contracts";
 import { busyRetryDelay, createWorkspace, selectedPDF, workspaceReducer } from "@/lib/student-workspace";
+import { CONNECTING, WAKING_UP, WAKING_UP_AFTER_MS, progressLabel } from "@/lib/student-progress";
 import { Button } from "@/components/ui/button";
 import { Sidebar, SidebarBrand } from "./sidebar";
 import { Conversation, EmptyConversation } from "./conversation";
 import { ProgramPicker, type CurriculumState } from "./program-picker";
 import { programShortName } from "@/lib/programs";
 import { SIGN_IN_ENABLED } from "@/lib/auth-policy";
+import { UPLOADS_ENABLED } from "@/lib/privacy-copy";
 import { Composer } from "./composer";
 import { BrandMark } from "./brand-mark";
 import { AppearanceControl } from "./appearance-control";
@@ -24,7 +26,6 @@ import { RephraseDialog, SuppliedDetailsPanel } from "./follow-up-dialog";
 
 /** m:ss, for the question-limit wait. */
 const clockText = (ms: number) => { const seconds = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`; };
-const stages: Record<string, string> = { waiting: "Waiting for a free answer slot… You can stop waiting.", understanding: "Checking the information for your question…", writing: "Preparing the response…" };
 function errorText(error: unknown) {
   if (error instanceof StudentTransportError) {
     if (error.code === "sign_in_required" || error.code === "psu_account_required") return "Your sign-in needs attention. Sign in again to continue; your conversation is still visible here.";
@@ -42,7 +43,7 @@ export function Workspace({ signedIn = false }: { signedIn?: boolean }) {
   const [pickerKey, setPickerKey] = useState(0);
   const [scopeOpen, setScopeOpen] = useState(true), [filesOpen, setFilesOpen] = useState(false), [clearOpen, setClearOpen] = useState(false);
   const [files, setFiles] = useState<ChatFile[]>([]), [fileWarning, setFileWarning] = useState<string | null>(null);
-  const [sources, setSources] = useState<StudentSourceSummary[] | null>(null), [progress, setProgress] = useState("Connecting…");
+  const [sources, setSources] = useState<StudentSourceSummary[] | null>(null), [progress, setProgress] = useState(CONNECTING);
   const [detailsOpen, setDetailsOpen] = useState(false), [rephraseOpen, setRephraseOpen] = useState(false), [selectedDetails, setSelectedDetails] = useState<string[]>([]);
   // A question refused before it started: all answer slots busy, or this person's question limit (`limited`).
   // `retryAt` (epoch ms) is when it is sent again, null once automatic busy retries stop.
@@ -130,12 +131,14 @@ export function Workspace({ signedIn = false }: { signedIn?: boolean }) {
     if (flight.current || !text || signInNeeded || !selectedScope) return;
     const value = begin("chat");
     setClarification(null); setSelectedDetails([]); setReview(null); setRetry(null);
-    dispatch({ type: "submit", id: value.id, ...(confirmed ? { text, clearDraft: confirmed.clearDraft } : {}) }); setProgress("Connecting…");
+    dispatch({ type: "submit", id: value.id, ...(confirmed ? { text, clearDraft: confirmed.clearDraft } : {}) }); setProgress(CONNECTING);
+    // Nothing received yet after a while: the hosted server is probably starting.
+    const waking = setTimeout(() => { if (!value.controller.signal.aborted) setProgress(WAKING_UP); }, WAKING_UP_AFTER_MS);
     try {
       const answer = await sendStudentMessage({ id: value.id, text, programId: selectedScope.programId, curriculumId: selectedScope.curriculumId }, {
         signal: value.controller.signal,
-        onText: text => { if (!value.controller.signal.aborted) dispatch({ type: "delta", id: value.id, text }); },
-        onProgress: stage => { if (!value.controller.signal.aborted) setProgress(stages[stage]); },
+        onText: text => { clearTimeout(waking); if (!value.controller.signal.aborted) dispatch({ type: "delta", id: value.id, text }); },
+        onProgress: stage => { clearTimeout(waking); if (!value.controller.signal.aborted) setProgress(progressLabel(stage)); },
       });
       if (!value.controller.signal.aborted) {
         dispatch({ type: "complete", id: value.id, answer });
@@ -153,7 +156,7 @@ export function Workspace({ signedIn = false }: { signedIn?: boolean }) {
         setNow(Date.now());
       } else dispatch({ type: "interrupt", id: value.id, warning: errorText(error) });
     }
-    finally { finish(value); }
+    finally { clearTimeout(waking); finish(value); }
   }
   // The retry timer calls the latest send with the latest retry state.
   const sendRef = useRef(send), retryRef = useRef(retry); sendRef.current = send; retryRef.current = retry;
@@ -276,7 +279,7 @@ export function Workspace({ signedIn = false }: { signedIn?: boolean }) {
       </div>}
       {state.warning && <div className="outcome-notice status-danger" role="alert"><p>{state.warning}</p>{signInNeeded && <a href="/login">Sign in again</a>}{state.messages.some(message => message.role === "user") && <Button variant="outline" size="sm" onClick={() => draft(state.messages.findLast(message => message.role === "user")?.text ?? "")}>Edit question</Button>}</div>}
       {signInNeeded && !state.warning && <p className="session-notice" role="alert">Your sign-in needs attention. <a href="/login">Sign in again</a> to continue.</p>}
-      <Composer live picker={picker} locked={!scope && <>
+      <Composer live uploads={UPLOADS_ENABLED} picker={picker} locked={!scope && <>
           <Lock size={16} aria-hidden="true" />
           <span>{curriculaStatus === "failed" ? "We couldn't load the program list, so chat is locked." : "Choose your program to unlock the chat."}</span>
           {curriculaStatus === "failed" && <Button type="button" size="sm" variant="outline" onClick={() => { setCurriculaAttempt(n => n + 1); openPicker(); }}>Try again</Button>}
@@ -286,7 +289,7 @@ export function Workspace({ signedIn = false }: { signedIn?: boolean }) {
         tools={<><Button type="button" variant="ghost" size="sm" className="program-chip" disabled={busy === "file" || busy === "clear" || busy === "signout"} aria-label={scope ? `Program: ${scope.programName}. Change program or curriculum` : "Choose your program"} title={scope ? "Change program or curriculum" : "Choose your program"} onClick={() => openPicker()}>
             <GraduationCap size={16} aria-hidden="true" />{scope ? <span className="program-chip-label">{programShortName(scope.programId, scope.programName)}</span> : <span>Choose program</span>}<ChevronDown size={14} aria-hidden="true" />
           </Button>
-          <Button type="button" variant="ghost" size="sm" disabled={!!busy || !scope} aria-label="Files in this chat" onClick={() => setFilesOpen(true)}><FolderOpen size={16} aria-hidden="true" />Files{files.length ? ` (${files.length})` : ""}</Button>
+          {UPLOADS_ENABLED && <Button type="button" variant="ghost" size="sm" disabled={!!busy || !scope} aria-label="Files in this chat" onClick={() => setFilesOpen(true)}><FolderOpen size={16} aria-hidden="true" />Files{files.length ? ` (${files.length})` : ""}</Button>}
           {details.length > 0 && <Button type="button" variant="ghost" size="sm" disabled={!!busy || signInNeeded} onClick={() => setDetailsOpen(true)}>Include earlier details{selectedDetails.length ? ` (${selectedDetails.length})` : ""}</Button>}</>}
       />
       </div>
