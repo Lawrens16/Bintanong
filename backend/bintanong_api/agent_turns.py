@@ -14,6 +14,7 @@ from backend.bintanong_api.session import ApiError, Session
 from backend.bintanong_private_context.dialogue import DialogueExchange, bounded_text
 
 LANGUAGE_CODES = {'english': 'en', 'taglish': 'taglish'}  # the frontend's language codes
+MAX_QUESTION_CHARS = 1000  # a longer question costs many times a normal one on the hosted model (16 Nov 2026)
 
 
 @dataclass(frozen=True)
@@ -70,6 +71,12 @@ class AgentTurns(ChatTurns):
     def __init__(self, sessions, agent, curricula, course_labels=None):
         super().__init__(sessions, agent, curricula, course_labels=course_labels)
         self._agent = agent
+
+    def prepare(self, request) -> PreparedTurn:
+        turn = super().prepare(request)
+        if len(turn.text) > MAX_QUESTION_CHARS:
+            raise ApiError(422, 'message_too_long')
+        return turn
 
     async def run(self, session: Session, turn: PreparedTurn, progress=_ignore) -> AgentReply:
         try:

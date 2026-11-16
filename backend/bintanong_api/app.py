@@ -9,7 +9,8 @@ from fastapi import Depends, FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 
 from backend.bintanong_api.admission import AdmittedStream, AnswerAdmission
-from backend.bintanong_api.rate_limit import CLIENT_COOKIE, CLIENT_COOKIE_MAX_AGE, QuestionRateLimit, client_id
+from backend.bintanong_api.rate_limit import (CLIENT_COOKIE, CLIENT_COOKIE_MAX_AGE, QuestionRateLimit,
+                                              admit_together, client_id)
 from backend.bintanong_api.auth import authorize
 from backend.bintanong_api.chat import ChatRequest, ChatTurns, CurriculumOption
 from backend.bintanong_api.main import HealthStatus, dependency_health, health_live, health_ready
@@ -32,6 +33,10 @@ class ApiSettings:
     max_waiting_answers: int = 4
     max_questions_per_window: int = 5  # per person (account, or guest browser); owner 3 Nov 2026
     question_window_seconds: int = 300
+    max_questions_per_day: int | None = None  # per person, rolling 24 hours; None = no daily limit
+    max_questions_per_day_total: int | None = None  # everyone together; hosted fork (owner, 16 Nov 2026)
+    max_request_bytes: int | None = None  # refuse a larger or unsized request body before reading it
+    api_docs: bool = True  # False serves no /openapi.json, /docs or /redoc
     require_auth: bool = False  # trusted offline/test compositions preserve their existing contract
     allow_guests: bool = False  # explicit access policy; supplied credentials still require verification
 
@@ -62,6 +67,7 @@ def create_app(services: ApiServices, settings: ApiSettings) -> FastAPI:
             if services.close is not None:
                 await services.close()
     app = FastAPI(title='Bintanong API', version='0.0.0', lifespan=lifespan,
+                  openapi_url='/openapi.json' if settings.api_docs else None,
                   dependencies=[Depends(check_origin), Depends(authorize)])
     app.state.services, app.state.settings = services, settings
     turns = services.turns or ChatTurns(services.sessions, services.pipeline, services.curricula,
@@ -70,6 +76,11 @@ def create_app(services: ApiServices, settings: ApiSettings) -> FastAPI:
                                                       waiting=settings.max_waiting_answers)
     app.state.question_limit = question_limit = QuestionRateLimit(limit=settings.max_questions_per_window,
                                                                   window_seconds=settings.question_window_seconds)
+    day = 24 * 60 * 60
+    person_day_limit = (None if settings.max_questions_per_day is None else
+                        QuestionRateLimit(limit=settings.max_questions_per_day, window_seconds=day))
+    site_day_limit = (None if settings.max_questions_per_day_total is None else
+                      QuestionRateLimit(limit=settings.max_questions_per_day_total, window_seconds=day))
     if services.uploads:
         app.include_router(upload_router(services, turns, settings.max_upload_bytes, settings.max_parallel_uploads))
     if services.evaluation is not None:
@@ -124,6 +135,18 @@ def create_app(services: ApiServices, settings: ApiSettings) -> FastAPI:
                                 samesite='strict', path='/')
         return response
 
+    if settings.max_request_bytes is not None:
+        @app.middleware('http')
+        async def refuse_large_requests(request: Request, call_next):
+            # FastAPI reads the whole body before any dependency runs, so the size is checked here first.
+            if request.method in ('POST', 'PUT', 'PATCH'):
+                length = request.headers.get('content-length')
+                if length is None:
+                    return JSONResponse({'error': 'length_required'}, status_code=411)
+                if not length.isdigit() or int(length) > settings.max_request_bytes:
+                    return JSONResponse({'error': 'request_too_large'}, status_code=413)
+            return await call_next(request)
+
     @app.post('/chat')
     def chat(body: ChatRequest, request: Request, session: Session = Depends(require_session)) -> AdmittedStream:
         turn = turns.prepare(body)
@@ -138,10 +161,15 @@ def create_app(services: ApiServices, settings: ApiSettings) -> FastAPI:
             person = 'browser:' + browser
         reservation = admission.reserve(account_id=identity)
         # Counted only once admitted, so a busy refusal never uses the person's quota.
-        wait = question_limit.admit(person)
-        if wait is not None:
+        limits = [(question_limit, person, 'rate_limited')]
+        if person_day_limit is not None:
+            limits.append((person_day_limit, person, 'daily_limit_reached'))
+        if site_day_limit is not None:
+            limits.append((site_day_limit, 'everyone', 'site_limit_reached'))
+        refused = admit_together(limits)
+        if refused is not None:
             reservation.release()
-            raise ApiError(429, 'rate_limited', retry_after=wait)
+            raise ApiError(429, refused[0], retry_after=refused[1])
         # Last: no raises after the reservation is handed to the response.
         return AdmittedStream(chat_stream(turns, session, turn, services.sources, reservation,
                                           services.course_labels), reservation,
