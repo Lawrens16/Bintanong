@@ -58,8 +58,16 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
   100 s. Supabase: RLS on every table, public key read-only. Owner approved the
   [security plan](../2026-11-16-hosted-agent-security-plan.md): sign-in only, 20 per person / 150 per site per
   day, counts in memory. Branch `feat/agent-sign-in-limits`.
-- **Next action:** implement plan tasks 2-6 test-first (daily limits, guests off, hardening, frontend, attack
-  check); then the owner's go-live steps (Supabase redirect URL, Render env and deploy).
+- 16 Nov, built test-first on `feat/agent-sign-in-limits` (not pushed, not deployed): daily limits, sign-in
+  required, size/length limits, no API description, three browser headers, notice wording. Agent + API tests
+  448 passed; frontend 127 of 127; TypeScript clean. Local attack check: access 24/24, model manipulation
+  10/10, limits 4/4, no key or personal detail in responses or logs.
+  [Results](../2026-11-16-hosted-agent-security-results.md).
+- 16 Nov privacy follow-up: sign-in also stores name and photo link; owner chose records deleted 7 days after
+  last use (pg_cron job `delete-unused-sign-ins`, active) and bintanongbinturong@gmail.com for requests; notice
+  updated (frontend 127/127).
+- **Next action:** push and merge into PR #1, then the owner deploys Render with `BINTANONG_ALLOW_GUESTS` removed;
+  then the live recheck with a real school sign-in.
 
 ## Delivered repairs
 

@@ -8,6 +8,14 @@ AGENTS.md, current progress or dated review records supersede older entries wher
 
 ## Owner decisions to preserve across CLI sessions
 
+- 16 November 2026 (fork: temporary sign-in records and data contact). After review showed Google sign-in stores
+  the name, school email and profile photo link (not only the email), the owner asked: "can we not make them
+  really temporary?" and chose: delete a sign-in record 7 days after it was last used, by an automatic Supabase
+  job (pg_cron, one scheduled delete on auth.users; "Automatic job"); data requests go to
+  bintanongbinturong@gmail.com. This amends the fork's database rule once more: pg_cron and that one job are
+  allowed; still no migrations, app tables, app writes or service-role key. Daily question counts stay in memory
+  under an anonymous account number. SQL: `supabase/hosted/2026-11-16-delete-unused-sign-ins.sql`.
+
 - 16 November 2026 (fork: school sign-in and question limits). Owner asked for a security check and: "maybe have
   a login system whereas we set only @psu.palawan.edu.ph corp gmail that the school provides and give them a
   limited amount of queries to make?" A read-only check showed the backend could be called directly without

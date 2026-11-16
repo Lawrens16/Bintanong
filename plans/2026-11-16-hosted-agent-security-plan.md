@@ -2,7 +2,7 @@
 
 Status: approved by the owner, 16 November 2026 (plan approval in session). Bounded work on the personal fork
 after Phase 13; no Phase 14 is opened. Results: [security results](2026-11-16-hosted-agent-security-results.md)
-(written when the checks have run). Not a thesis result, not institutional approval.
+(checks run 16 Nov). Not a thesis result, not institutional approval.
 
 ## Context
 
