@@ -103,6 +103,11 @@ def test_allowed_origins_come_from_the_environment():
     assert strict.app.state.settings.allow_guests is False
 
 
+def test_allowed_origin_with_trailing_slash_matches_the_browser_origin():
+    _, client = started(BINTANONG_ALLOWED_ORIGINS=ORIGIN + '/ , https://second.example//')
+    assert client.app.state.settings.allowed_origins == (ORIGIN, 'https://second.example')
+
+
 def chat_body(text):
     return dict(id='chat-1', trigger='submit-message',
                 messages=[dict(id='msg-1', role='user', parts=[dict(type='text', text=text)])])
@@ -176,3 +181,54 @@ def test_grade_uploads_are_switched_off():
     _, client = started()
     assert client.post('/uploads?programId=p&curriculumId=c', content=b'%PDF-1.4').status_code == 404
     assert client.post('/uploads/u1/confirm', json={'decisions': []}).status_code == 404
+
+
+def test_daily_question_limits_default_to_the_owner_values_and_follow_the_environment():
+    _, client = started()
+    settings = client.app.state.settings
+    assert (settings.max_questions_per_day, settings.max_questions_per_day_total) == (20, 150)
+    _, tuned = started(BINTANONG_DAILY_QUESTIONS_PER_PERSON='3', BINTANONG_DAILY_QUESTIONS_TOTAL=' 7 ')
+    settings = tuned.app.state.settings
+    assert (settings.max_questions_per_day, settings.max_questions_per_day_total) == (3, 7)
+
+
+@pytest.mark.parametrize('name', ['BINTANONG_DAILY_QUESTIONS_PER_PERSON', 'BINTANONG_DAILY_QUESTIONS_TOTAL'])
+@pytest.mark.parametrize('value', ['0', '-1', 'many', '2.5'])
+def test_a_daily_limit_must_be_a_positive_whole_number(name, value):
+    with pytest.raises(ValueError, match='daily_limit_invalid'):
+        agent_app().load_agent_app(environment(**{name: value}), client=SpyClient(), model=loop.FakeModel())
+
+
+def test_without_guest_mode_nothing_is_served_without_a_sign_in_even_with_the_site_origin():
+    spy, client = started(loop.FakeModel(), BINTANONG_ALLOW_GUESTS=None)
+    for response in (client.post('/chat', json=chat_body('Question')), client.get('/curricula'),
+                     client.get('/sources/ev-' + spy.tables['chunks'][0]['chunk_id']),
+                     client.post('/chat', json=chat_body('Question'), headers={'Authorization': 'Token abc'})):
+        assert response.status_code == 401 and response.json() == {'error': 'sign_in_required'}
+    assert client.get('/health/live').status_code == 200
+
+
+def test_a_question_over_a_thousand_characters_is_refused_before_the_model():
+    model = loop.FakeModel(loop.final_turn(text='Hello.'))
+    _, client = started(model)
+    refused = client.post('/chat', json=chat_body('a' * 1001))
+    assert refused.status_code == 422 and refused.json() == {'error': 'message_too_long'}
+    assert model.requests == []
+    assert client.post('/chat', json=chat_body('a' * 1000)).status_code == 200
+
+
+def test_an_oversized_request_is_refused_by_its_declared_length():
+    model = loop.FakeModel()
+    _, client = started(model)
+    refused = client.post('/chat', content=b'{"padding": "' + b'a' * 70000 + b'"}',
+                          headers={'Content-Type': 'application/json'})
+    assert refused.status_code == 413 and refused.json() == {'error': 'request_too_large'}
+    unsized = client.post('/chat', content=iter([b'{"messages": []}']), headers={'Content-Type': 'application/json'})
+    assert unsized.status_code == 411 and unsized.json() == {'error': 'length_required'}
+    assert model.requests == []
+
+
+def test_the_hosted_app_does_not_publish_its_api_description():
+    _, client = started()
+    for path in ('/openapi.json', '/docs', '/redoc'):
+        assert client.get(path).status_code == 404

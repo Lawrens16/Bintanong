@@ -13,6 +13,7 @@ import { Conversation, EmptyConversation } from "./conversation";
 import { ProgramPicker, type CurriculumState } from "./program-picker";
 import { programShortName } from "@/lib/programs";
 import { SIGN_IN_ENABLED } from "@/lib/auth-policy";
+import { limitNotice } from "@/lib/question-limits";
 import { UPLOADS_ENABLED } from "@/lib/privacy-copy";
 import { Composer } from "./composer";
 import { BrandMark } from "./brand-mark";
@@ -28,6 +29,8 @@ import { RephraseDialog, SuppliedDetailsPanel } from "./follow-up-dialog";
 const clockText = (ms: number) => { const seconds = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`; };
 function errorText(error: unknown) {
   if (error instanceof StudentTransportError) {
+    const limit = limitNotice(error.code, error.retryAfter);
+    if (limit) return limit;
     if (error.code === "sign_in_required" || error.code === "psu_account_required") return "Your sign-in needs attention. Sign in again to continue; your conversation is still visible here.";
     if (error.code === "answers_busy") return "All answer slots are busy. Your question is still here; try again later.";
     if (error.code === "account_busy" || error.code === "chat_in_progress") return "Another question from this account or browser session is still running. Wait for it to finish or stop it in that tab.";

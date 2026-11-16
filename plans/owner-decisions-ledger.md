@@ -8,6 +8,31 @@ AGENTS.md, current progress or dated review records supersede older entries wher
 
 ## Owner decisions to preserve across CLI sessions
 
+- 16 November 2026, later (fork: sign-in parked, site public). Owner: "can we just scrap that login thing, dont
+  entirely scrap it but save it somewhere if i've finally made up my mind in implementing this login thing, for
+  now keep it public." So: guest chat stays on; the PSU sign-in code stays in the repo, switched off; the pg_cron
+  cleanup job and extension were removed from Supabase (SQL kept in `supabase/hosted/`), so the database is as it
+  was before 16 Nov. Daily limits and the hardening stay on. The sign-in decisions below (accounts, limits, 7-day
+  records, contact) remain settled for when it is switched on. How: `plans/2026-11-16-school-sign-in-parked.md`.
+
+- 16 November 2026 (fork: temporary sign-in records and data contact). After review showed Google sign-in stores
+  the name, school email and profile photo link (not only the email), the owner asked: "can we not make them
+  really temporary?" and chose: delete a sign-in record 7 days after it was last used, by an automatic Supabase
+  job (pg_cron, one scheduled delete on auth.users; "Automatic job"); data requests go to
+  bintanongbinturong@gmail.com. This amends the fork's database rule once more: pg_cron and that one job are
+  allowed; still no migrations, app tables, app writes or service-role key. Daily question counts stay in memory
+  under an anonymous account number. SQL: `supabase/hosted/2026-11-16-delete-unused-sign-ins.sql`.
+
+- 16 November 2026 (fork: school sign-in and question limits). Owner asked for a security check and: "maybe have
+  a login system whereas we set only @psu.palawan.edu.ph corp gmail that the school provides and give them a
+  limited amount of queries to make?" A read-only check showed the backend could be called directly without
+  limit. Owner chose: sign-in only (no guest chat on the hosted site); 20 questions per person per day; 150 per
+  day for the whole site; counts kept in server memory (they restart when the free server sleeps; accepted).
+  The existing PSU Google sign-in is switched back on for the fork (it was off since 4 Nov). This amends the
+  fork's "No Supabase change" rule only for Supabase's own sign-in records (school email) and one redirect-URL
+  entry; still no migrations, tables, app writes or service-role key. The privacy notice says sign-in stores
+  the school email. Plan: `plans/2026-11-16-hosted-agent-security-plan.md`. Not legal or institutional sign-off.
+
 - 15 November 2026 (fork: no grades or identity; general privacy notice). After reviewing that the hosted agent
   sends questions to a third-party model API, the owner chose to generalize the notice ("make it generalized?
   Like not to specify the deepseek") and to bar grades ("what if we just barred them from entering any grades?

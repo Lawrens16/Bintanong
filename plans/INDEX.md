@@ -2,12 +2,16 @@
 
 ## Current state
 
+- **Returning to the fork? Start with [resume here](2026-11-16-fork-resume-here.md)** (state, open items, how to run).
 - No active phase. Latest final handoff: [Phase 13 hosted-LLM agent (fork)](phase-13-handoff.md), complete
   with disclosures; deployed at https://bintanong.vercel.app (backend on Render free). Next permitted phase: 14.
   [Plan](phase-13-hosted-llm-agent-plan.md), [superseded checkpoint](phase-13-checkpoint.md),
   [PRD](2026-11-15-hosted-llm-fork-prd.md), [hosting research](2026-11-15-phase-13-pre-phase-research.md).
   Worktree: Orca workspace `Bintanong-personal/dev`, branch `feat/hosted-llm-agent` (push to `origin` only).
   Separate from the thesis; the original Gemma path and Supabase stay unchanged.
+- Fork security work (owner-approved 16 Nov, no phase opened): [plan and findings](2026-11-16-hosted-agent-security-plan.md),
+  [results and go-live steps](2026-11-16-hosted-agent-security-results.md);
+  daily limits and hardening live; school sign-in built but [parked](2026-11-16-school-sign-in-parked.md).
 - Phase 12 research/software evaluation write-up complete with disclosures.
   [Plan](phase-12-evaluation-writeup-plan.md), [superseded checkpoint](phase-12-checkpoint.md),
   [latest final handoff](phase-12-handoff.md), [report](../docs/evaluation/phase12-evaluation-report.md).

@@ -1,5 +1,6 @@
 import { authConfiguration } from "@/lib/server-auth";
-import { SIGN_IN_ENABLED } from "@/lib/auth-policy";
+import { GUESTS_ALLOWED, SIGN_IN_ENABLED } from "@/lib/auth-policy";
+import { signInNotice } from "@/lib/privacy-copy";
 import { AppearanceControl } from "@/components/workspace/appearance-control";
 import { BrandMark } from "@/components/workspace/brand-mark";
 import { Button } from "@/components/ui/button";
@@ -26,17 +27,17 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
       <section className="auth-content" aria-labelledby="login-title">
         <p className="public-eyebrow">PalSU undergraduate research preview</p>
         <h1 id="login-title">Sign in to Bintanong</h1>
-        <p>Continue as a guest, or use your PSU Google account to ask about subjects, prerequisites, enrollment and university policies.</p>
+        <p>{GUESTS_ALLOWED ? "Continue as a guest, or use" : "Use"} your PSU Google account to ask about subjects, prerequisites, enrollment and university policies.</p>
         {notice === "signed_out" && <p role="status">You're signed out of Bintanong on this browser.</p>}
         {notice === "cleanup_pending" && <p role="status">You're signed out of Bintanong on this browser. We couldn't confirm that all temporary data was cleared.</p>}
         {error && <p role="alert" className="outcome-notice status-danger">{error === "psu_account_required" ? "Use a verified @psu.palawan.edu.ph Google account." : "Sign-in could not finish. Please try again."}</p>}
         <form action="/auth/login" method="post"><Button type="submit" disabled={!available || !SIGN_IN_ENABLED} className="google-sign-in">
           <span className="google-letter" aria-hidden="true">G</span>Continue with PSU Google
         </Button></form>
-        <Button asChild variant="outline"><a href="/chat">Continue as guest</a></Button>
+        {GUESTS_ALLOWED && <Button asChild variant="outline"><a href="/chat">Continue as guest</a></Button>}
         {!available && <p role="status" className="auth-status">PSU Google sign-in is unavailable right now. <a href="/login">Try again</a>.</p>}
-        <p className="auth-account-note">Signing in requires a verified @psu.palawan.edu.ph Google account. Guest access does not require sign-in.</p>
-        <div className="auth-privacy"><p>Sign-in stores your account email. Chat messages and course details stay temporary.</p>
+        <p className="auth-account-note">Signing in requires a verified @psu.palawan.edu.ph Google account.{GUESTS_ALLOWED ? " Guest access does not require sign-in." : " Each student can ask a limited number of questions each day."}</p>
+        <div className="auth-privacy"><p>{signInNotice}</p>
           <a href="/#privacy">How your information is handled</a></div>
       </section>
       <footer className="auth-footer">Bintanong is an AI guide. Verify important academic decisions with the relevant university office or academic adviser.</footer>

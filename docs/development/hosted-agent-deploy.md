@@ -30,8 +30,10 @@ Target: backend on Render (free web service, 512 MB), frontend on Vercel (Hobby)
 | `DEEPSEEK_API_KEY` | Provider key; `OPENAI_API_KEY`, `GEMINI_API_KEY`, `ANTHROPIC_API_KEY` for the others |
 | `BINTANONG_LLM_MODEL` | Optional; defaults `deepseek-flash`, `gemini-3.8-flash`, `claude-haiku-5-5`; required for `openai` |
 | `BINTANONG_LLM_THINKING` | Optional `1` turns DeepSeek thinking on |
-| `BINTANONG_ALLOWED_ORIGINS` | Comma-separated site origins allowed to post, e.g. the Vercel URL |
-| `BINTANONG_ALLOW_GUESTS` | `1` lets visitors chat without signing in |
+| `BINTANONG_ALLOWED_ORIGINS` | Comma-separated site origins allowed to post, e.g. the Vercel URL (a trailing `/` is ignored) |
+| `BINTANONG_ALLOW_GUESTS` | `1` lets visitors chat without signing in (the public site, for now). Unset, chatting needs a verified `@psu.palawan.edu.ph` Google sign-in: see `plans/2026-11-16-school-sign-in-parked.md` |
+| `BINTANONG_DAILY_QUESTIONS_PER_PERSON` | Optional, default `20`: questions one person may ask in a rolling 24 hours |
+| `BINTANONG_DAILY_QUESTIONS_TOTAL` | Optional, default `150`: questions everyone together may ask in a rolling 24 hours |
 | `BINTANONG_RELEASE_ID` | `p12-research-faqsplit-20261030` |
 | `BINTANONG_RESEARCH_AUTHORIZATION` | `research-owner-20261029` |
 

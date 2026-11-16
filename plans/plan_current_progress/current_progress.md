@@ -1,6 +1,6 @@
 # Current progress
 
-Updated 15 November 2026. Phase 13 hosted-LLM agent (personal fork) closed with a [final handoff](../phase-13-handoff.md); branch `feat/hosted-llm-agent`.
+Updated 16 November 2026. **Resume the fork from [resume here](../2026-11-16-fork-resume-here.md).** Phase 13 hosted-LLM agent (personal fork) closed with a [final handoff](../phase-13-handoff.md); branch `feat/hosted-llm-agent`.
 Last full snapshot before condensation: `d2ad9fef`; before the Phase 13 entries: `f1fe3f2b` (recover with `git show`).
 Gathering checkout and owner USG notes remain separate. Phase 12 research/software write-up is complete with
 disclosures; the original build's Phase 13 deployment stays cancelled.
@@ -50,7 +50,30 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
   121 frontend tests pass; browser checked). Decision in `plans/owner-decisions-ledger.md`.
 - Live (15 Nov, after the owner's Render deploy): Render and Vercel `/uploads` return 404; public pages show the
   new notice; a chat containing a student number and email answered CS 6 eligibility correctly (6.6 s).
-- **Next action:** none pending; owner reviews/merges PR #1 when ready. Optional: Render cold-start timing.
+- 16 Nov: `BINTANONG_ALLOWED_ORIGINS` accepts a trailing slash (RED 1 failed, then agent + API test files 430
+  passed; full suite not rerun). Handoff prerequisites brought up to date; merged local milestone branches
+  deleted, `agent-m2`..`agent-m8` tags kept. Not pushed or deployed.
+- 16 Nov security check (read-only): the Render backend accepted a direct `POST /chat` with a typed-in `Origin`
+  header and no cookie, so guests were unlimited; `/openapi.json` public; no request-size limit; cold start over
+  100 s. Supabase: RLS on every table, public key read-only. Owner approved the
+  [security plan](../2026-11-16-hosted-agent-security-plan.md): sign-in only, 20 per person / 150 per site per
+  day, counts in memory. Branch `feat/agent-sign-in-limits`.
+- 16 Nov, built test-first on `feat/agent-sign-in-limits` (not pushed, not deployed): daily limits, sign-in
+  required, size/length limits, no API description, three browser headers, notice wording. Agent + API tests
+  448 passed; frontend 127 of 127; TypeScript clean. Local attack check: access 24/24, model manipulation
+  10/10, limits 4/4, no key or personal detail in responses or logs.
+  [Results](../2026-11-16-hosted-agent-security-results.md).
+- 16 Nov privacy follow-up: sign-in also stores name and photo link; owner chose records deleted 7 days after
+  last use (pg_cron job `delete-unused-sign-ins`, active) and bintanongbinturong@gmail.com for requests; notice
+  updated (frontend 127/127).
+- 16 Nov, later: owner parked the sign-in and kept the site public ([note](../2026-11-16-school-sign-in-parked.md));
+  guest chat back on, limits and hardening kept; Supabase cleanup job and pg_cron removed (database as before).
+  Frontend 126/126, TypeScript clean.
+- Live (16 Nov, 22:40): Vercel public again (`/chat` 200, `/login` -> `/`, three headers); Render on the new code
+  with guests on (`/openapi.json` 404; 1,001-character question 422); a guest question answered through the site
+  in 3.9 s.
+- **Next action:** none pending. Optional: open a PR to bring `main` up to date; switch sign-in on only when the
+  owner decides (parked note).
 
 ## Delivered repairs
 

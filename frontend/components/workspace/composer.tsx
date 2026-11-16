@@ -2,6 +2,7 @@ import { useId, useLayoutEffect, useRef, type ReactNode, type RefObject } from "
 import { FileImage, FileText, Plus, Square, TriangleAlert, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { MAX_QUESTION_CHARS } from "@/lib/question-limits";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { shouldSend, type Attachment } from "@/lib/workspace";
 import { SendIcon } from "./send-icon";
@@ -55,7 +56,7 @@ export function Composer({ draft, attachments, warning, pending, onDraft, onSend
             <Button variant="ghost" size="icon" type="button" className="remove-file" aria-label={`Remove ${file.name}`} onClick={() => onRemove(file.id)}><X aria-hidden="true" /></Button>
           </li>)}</ul>
         </div>}
-        <Textarea ref={input} value={draft} rows={1} disabled={!!locked} aria-label="Your question" aria-describedby={locked || onStop ? hintId : undefined} placeholder={locked ? "Choose your program to start chatting" : "Ask Bintanong"} onChange={event => onDraft(event.target.value)} onKeyDown={event => {
+        <Textarea ref={input} value={draft} rows={1} maxLength={MAX_QUESTION_CHARS} disabled={!!locked} aria-label="Your question" aria-describedby={locked || onStop ? hintId : undefined} placeholder={locked ? "Choose your program to start chatting" : "Ask Bintanong"} onChange={event => onDraft(event.target.value)} onKeyDown={event => {
           if (!locked && shouldSend({ key: event.key, shiftKey: event.shiftKey, isComposing: event.nativeEvent.isComposing, keyCode: event.nativeEvent.keyCode })) { event.preventDefault(); onSend(); }
         }} />
       </div>

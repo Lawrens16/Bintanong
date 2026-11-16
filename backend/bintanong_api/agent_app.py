@@ -35,6 +35,8 @@ from .research_app import _public_key
 PAGE_ROWS = 1000  # the hosted API returns at most this many rows per request
 PAGED_TABLES = {'source_spans': 'chunk_id,span_order'}  # table -> a stable order to page by
 MAX_RUNNING_ANSWERS = 4  # hosted model calls are awaited, so a few answers can run at once
+MAX_REQUEST_BYTES = 64 * 1024  # the site's own proxy sends at most 32 KB
+DAILY_QUESTIONS_PER_PERSON, DAILY_QUESTIONS_TOTAL = 20, 150  # owner, 16 Nov 2026; rolling 24 hours, in memory
 DISPLAY_NAMES = Path(__file__).resolve().parents[2] / 'knowledge' / 'manifests' / 'program-display-names.json'
 
 
@@ -84,6 +86,15 @@ def _required(env, names, code):
     return values
 
 
+def _daily_limit(env, name, default):
+    value = (env.get(name) or '').strip()
+    if not value:
+        return default
+    if not value.isdecimal() or int(value) < 1:
+        raise ValueError('daily_limit_invalid')
+    return int(value)
+
+
 def load_agent_app(env=None, *, client=None, model=None, names=None):
     """Uvicorn factory. `client`, `model` and `names` are for tests; a deployment passes none of them."""
     env = os.environ if env is None else env
@@ -91,9 +102,13 @@ def load_agent_app(env=None, *, client=None, model=None, names=None):
     program_names, curriculum_names = names.get('programs', {}), names.get('curricula', {})
     url, key = _required(env, ('SUPABASE_URL', 'SUPABASE_ANON_KEY'), 'agent_credentials_required')
     key = _public_key(key)  # a service-role key is refused before anything is read
-    origins = tuple(origin.strip() for origin in env.get('BINTANONG_ALLOWED_ORIGINS', '').split(',') if origin.strip())
+    # A browser's Origin header never ends in "/", so a pasted "https://site/" is stored without it.
+    origins = tuple(origin.strip().rstrip('/') for origin in env.get('BINTANONG_ALLOWED_ORIGINS', '').split(',')
+                    if origin.strip().rstrip('/'))
     if not origins:
         raise ValueError('allowed_origins_required')
+    per_person = _daily_limit(env, 'BINTANONG_DAILY_QUESTIONS_PER_PERSON', DAILY_QUESTIONS_PER_PERSON)
+    whole_site = _daily_limit(env, 'BINTANONG_DAILY_QUESTIONS_TOTAL', DAILY_QUESTIONS_TOTAL)
     release_id, authorization_ref = _required(
         env, ('BINTANONG_RELEASE_ID', 'BINTANONG_RESEARCH_AUTHORIZATION'), 'release_required')
     model = model or build_model(AgentSettings.from_env(env))
@@ -128,7 +143,8 @@ def load_agent_app(env=None, *, client=None, model=None, names=None):
             course_labels=labels, auth=auth, close=close, ready=ready, uploads=False)
         return create_app(services, ApiSettings(
             allowed_origins=origins, require_auth=True, allow_guests=env.get('BINTANONG_ALLOW_GUESTS') == '1',
-            max_running_answers=MAX_RUNNING_ANSWERS))
+            max_running_answers=MAX_RUNNING_ANSWERS, max_questions_per_day=per_person,
+            max_questions_per_day_total=whole_site, max_request_bytes=MAX_REQUEST_BYTES, api_docs=False))
     except BaseException:
         client.close()
         raise

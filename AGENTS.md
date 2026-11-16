@@ -317,6 +317,9 @@ permission or authorization to execute institutional rules in Phase 06.
      this turn. Unknown or missing citations get one retry, then an honest "couldn't verify, ask the office".
   4. **Excluded-audience block.** Medicine, Law, graduate, laboratory school and staff-only questions get the
      fixed undergraduate-scope notice from code (existing `EXCLUDED_PROGRAM_CUES`).
+- Owner, 16 Nov 2026: the hosted site stays public (guest chat) with daily limits of 20 per browser and 150 per site;
+  the PSU Google sign-in is built but parked, and the Supabase cleanup job was removed, so the database rule above
+  holds unchanged. Switching sign-in on: `plans/2026-11-16-school-sign-in-parked.md`; its decisions are settled.
 - Unchanged: undergraduate scope, read-only advisory boundary, source-gap and unknown-versus-unmet rules,
   English/Taglish replies, private-upload isolation, TDD, Conventional Commits without AI attribution. Never
   push to `upstream` (`bintanong420/Bintanong`). Creating Render/Vercel projects, the first push of a new

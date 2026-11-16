@@ -120,3 +120,29 @@ Replies: English question -> English; Filipino/Taglish -> Taglish.
 - No request path issues a Supabase write; the service-role key is never read.
 - Original `research_app` path and its tests unchanged and passing.
 - Backend fits Render free memory, or curricula load on first use.
+
+## Amendment, 16 November 2026: sign-in and question limits (owner-approved)
+
+[Plan and findings](2026-11-16-hosted-agent-security-plan.md). A read-only check showed that anyone could ask
+unlimited questions by calling the backend directly, spending the owner's prepaid model balance.
+
+- **Access:** chatting requires a verified `@psu.palawan.edu.ph` Google account (the sign-in built for the
+  original system, switched back on). No guest chat on the hosted site.
+- **Limits:** 20 questions per person per rolling 24 hours, 150 for the whole site, on top of 5 per 5 minutes.
+  Counts are kept in server memory and restart when the free server sleeps or restarts.
+- **Privacy:** sign-in stores the student's name, school email and Google photo link in Supabase's sign-in
+  records, deleted 7 days after last use by a scheduled job; none of it is sent to the model provider. The notice
+  says so and gives bintanongbinturong@gmail.com for requests. Still no grades, no uploads.
+- **Supabase rule, amended only this far:** Supabase's own sign-in records and one redirect-URL entry in the
+  dashboard are allowed. Still no migrations, no new tables, no writes by the app, no service-role key.
+- **Hardening:** 1,000-character question limit, request-size limit, no public API description, three browser
+  security headers.
+
+Added acceptance criteria:
+
+- Without a valid school sign-in, `/chat` and `/curricula` on the backend refuse (401/403), including with a
+  forged `Origin` header.
+- The 21st question from one account within 24 hours and the 151st for the site are refused with a clear message.
+- A request over the size limit is refused before it is read; `/openapi.json` is not served.
+- The attack check in the plan (access, limits, model manipulation, leaks) is run and its results recorded.
+- The original `research_app` path and its tests stay unchanged.
