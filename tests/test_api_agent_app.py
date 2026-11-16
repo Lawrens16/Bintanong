@@ -103,6 +103,11 @@ def test_allowed_origins_come_from_the_environment():
     assert strict.app.state.settings.allow_guests is False
 
 
+def test_allowed_origin_with_trailing_slash_matches_the_browser_origin():
+    _, client = started(BINTANONG_ALLOWED_ORIGINS=ORIGIN + '/ , https://second.example//')
+    assert client.app.state.settings.allowed_origins == (ORIGIN, 'https://second.example')
+
+
 def chat_body(text):
     return dict(id='chat-1', trigger='submit-message',
                 messages=[dict(id='msg-1', role='user', parts=[dict(type='text', text=text)])])

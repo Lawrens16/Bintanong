@@ -91,7 +91,9 @@ def load_agent_app(env=None, *, client=None, model=None, names=None):
     program_names, curriculum_names = names.get('programs', {}), names.get('curricula', {})
     url, key = _required(env, ('SUPABASE_URL', 'SUPABASE_ANON_KEY'), 'agent_credentials_required')
     key = _public_key(key)  # a service-role key is refused before anything is read
-    origins = tuple(origin.strip() for origin in env.get('BINTANONG_ALLOWED_ORIGINS', '').split(',') if origin.strip())
+    # A browser's Origin header never ends in "/", so a pasted "https://site/" is stored without it.
+    origins = tuple(origin.strip().rstrip('/') for origin in env.get('BINTANONG_ALLOWED_ORIGINS', '').split(',')
+                    if origin.strip().rstrip('/'))
     if not origins:
         raise ValueError('allowed_origins_required')
     release_id, authorization_ref = _required(
