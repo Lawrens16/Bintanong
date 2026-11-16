@@ -113,3 +113,7 @@ public mode was pushed. Render was never deployed with guests off. Supabase: job
 
 Public mode keeps the limits and hardening, but a direct `POST /chat` with a typed-in Origin and no cookie is
 again accepted, and each such request counts as a new person; only the 150-a-day site cap bounds it.
+
+Live after the public-mode push (22:40): `/chat` 200 for guests, `/login` redirects home, the three headers
+present; Render serves the new code (`/openapi.json` 404, a 1,001-character question 422); a guest question was
+answered through the site in 3.9 s.

@@ -69,8 +69,11 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
 - 16 Nov, later: owner parked the sign-in and kept the site public ([note](../2026-11-16-school-sign-in-parked.md));
   guest chat back on, limits and hardening kept; Supabase cleanup job and pg_cron removed (database as before).
   Frontend 126/126, TypeScript clean.
-- **Next action:** owner keeps `BINTANONG_ALLOW_GUESTS=1` on Render and deploys by hand (brings the limits and
-  hardening live); then a live recheck.
+- Live (16 Nov, 22:40): Vercel public again (`/chat` 200, `/login` -> `/`, three headers); Render on the new code
+  with guests on (`/openapi.json` 404; 1,001-character question 422); a guest question answered through the site
+  in 3.9 s.
+- **Next action:** none pending. Optional: open a PR to bring `main` up to date; switch sign-in on only when the
+  owner decides (parked note).
 
 ## Delivered repairs
 
