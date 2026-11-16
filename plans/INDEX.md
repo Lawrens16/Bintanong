@@ -2,6 +2,7 @@
 
 ## Current state
 
+- **Returning to the fork? Start with [resume here](2026-11-16-fork-resume-here.md)** (state, open items, how to run).
 - No active phase. Latest final handoff: [Phase 13 hosted-LLM agent (fork)](phase-13-handoff.md), complete
   with disclosures; deployed at https://bintanong.vercel.app (backend on Render free). Next permitted phase: 14.
   [Plan](phase-13-hosted-llm-agent-plan.md), [superseded checkpoint](phase-13-checkpoint.md),

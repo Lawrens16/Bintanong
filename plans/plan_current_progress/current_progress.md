@@ -1,6 +1,6 @@
 # Current progress
 
-Updated 16 November 2026. Phase 13 hosted-LLM agent (personal fork) closed with a [final handoff](../phase-13-handoff.md); branch `feat/hosted-llm-agent`.
+Updated 16 November 2026. **Resume the fork from [resume here](../2026-11-16-fork-resume-here.md).** Phase 13 hosted-LLM agent (personal fork) closed with a [final handoff](../phase-13-handoff.md); branch `feat/hosted-llm-agent`.
 Last full snapshot before condensation: `d2ad9fef`; before the Phase 13 entries: `f1fe3f2b` (recover with `git show`).
 Gathering checkout and owner USG notes remain separate. Phase 12 research/software write-up is complete with
 disclosures; the original build's Phase 13 deployment stays cancelled.
