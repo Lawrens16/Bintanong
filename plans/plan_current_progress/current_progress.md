@@ -1,6 +1,6 @@
 # Current progress
 
-Updated 15 November 2026. Phase 13 hosted-LLM agent (personal fork) closed with a [final handoff](../phase-13-handoff.md); branch `feat/hosted-llm-agent`.
+Updated 16 November 2026. Phase 13 hosted-LLM agent (personal fork) closed with a [final handoff](../phase-13-handoff.md); branch `feat/hosted-llm-agent`.
 Last full snapshot before condensation: `d2ad9fef`; before the Phase 13 entries: `f1fe3f2b` (recover with `git show`).
 Gathering checkout and owner USG notes remain separate. Phase 12 research/software write-up is complete with
 disclosures; the original build's Phase 13 deployment stays cancelled.
@@ -50,7 +50,11 @@ Owner approved the plan and asked to start at Task 0. [Plan](../phase-13-hosted-
   121 frontend tests pass; browser checked). Decision in `plans/owner-decisions-ledger.md`.
 - Live (15 Nov, after the owner's Render deploy): Render and Vercel `/uploads` return 404; public pages show the
   new notice; a chat containing a student number and email answered CS 6 eligibility correctly (6.6 s).
-- **Next action:** none pending; owner reviews/merges PR #1 when ready. Optional: Render cold-start timing.
+- 16 Nov: `BINTANONG_ALLOWED_ORIGINS` accepts a trailing slash (RED 1 failed, then agent + API test files 430
+  passed; full suite not rerun). Handoff prerequisites brought up to date; merged local milestone branches
+  deleted, `agent-m2`..`agent-m8` tags kept. Not pushed or deployed.
+- **Next action:** owner approves the security plan (sign-in limited to the school domain, per-person question
+  limits, security review); owner reviews/merges PR #1 when ready.
 
 ## Delivered repairs
 

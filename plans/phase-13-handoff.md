@@ -84,6 +84,8 @@ model or Supabase change.
 
 ## Next-phase prerequisites
 
-Owner confirmation before opening the PR `feat/hosted-llm-agent` -> fork `dev`; owner decision on the privacy
-notice and repository visibility. Optional: measure Render cold start, live-test another provider when a key is
-available, accept a trailing slash in `BINTANONG_ALLOWED_ORIGINS`.
+Updated 16 Nov 2026: PR #1 is open on the fork (`feat/hosted-llm-agent` -> `main`; the fork has no `dev`
+branch) and waits for the owner's review and merge. The privacy and visibility decisions are made (15 Nov: no
+grades or identity, uploads off, repository stays public; see `plans/owner-decisions-ledger.md`). A trailing
+slash in `BINTANONG_ALLOWED_ORIGINS` is now accepted. Still optional: measure Render cold start and memory on
+Render, live-test another provider when a key is available.
