@@ -117,6 +117,7 @@ test('a rate limit keeps the server wait time, accepting only a sane whole numbe
   assert.equal(limited.status, 429);
   assert.equal(limited.retryAfter, 120);
   for (const bad of [-5, 0, 1.5, 99999, '60']) assert.equal((await attempt({ error: 'rate_limited', retryAfter: bad })).retryAfter, null);
+  assert.equal((await attempt({ error: 'daily_limit_reached', retryAfter: 86400 })).retryAfter, 86400, 'a daily limit can wait up to a day');
 });
 
 

@@ -20,3 +20,14 @@ test('the FAQ answer matches the notice', () => {
   assert.match(informationAnswer, /name, student number, grades/);
   assert.doesNotMatch(informationAnswer, /upload/i);
 });
+
+// Owner, 16 Nov 2026: chatting needs a school Google sign-in, which stores the school email address.
+test('the notice and the FAQ say sign-in keeps the school email and nothing else personal', () => {
+  for (const copy of [privacyNoticeBody, informationAnswer]) {
+    assert.match(copy, /@psu\.palawan\.edu\.ph Google account/);
+    assert.match(copy, /school email address/);
+    assert.match(copy, /not shared with the AI service/);
+    assert.doesNotMatch(copy, /No account is needed/);
+  }
+  assert.match(informationAnswer, /limited number of questions each day/);
+});

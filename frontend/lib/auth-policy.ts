@@ -1,11 +1,14 @@
 type User = { email?: string; email_confirmed_at?: string | null; identities?: { provider?: string; identity_data?: Record<string, unknown> }[] };
-// Owner, 4 Nov 2026: PSU Google sign-in is switched off for now and may return later. While false, nobody reaches
-// the sign-in page or starts an OAuth flow, and every visitor uses the guest mode.
-export const SIGN_IN_ENABLED = false;
+// Owner, 16 Nov 2026 (hosted fork): chatting needs a PSU Google sign-in and there is no guest chat, so one
+// person cannot spend the shared model balance. (Sign-in was off from 4 Nov; while false, nobody reaches the
+// sign-in page or starts an OAuth flow.) The API enforces the same rule; these only choose pages and controls.
+export const SIGN_IN_ENABLED = true;
+export const GUESTS_ALLOWED = false;
 
-export function pageRedirect(pathname: string, permitted: boolean, signInEnabled = SIGN_IN_ENABLED) {
+export function pageRedirect(pathname: string, permitted: boolean, signInEnabled = SIGN_IN_ENABLED, guestsAllowed = GUESTS_ALLOWED) {
   if (pathname === "/login" && !signInEnabled) return "/";
   if (pathname === "/login" && permitted) return "/chat";
+  if (pathname === "/chat" && !permitted && !guestsAllowed) return "/login";
   return null;
 }
 
